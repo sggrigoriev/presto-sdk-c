@@ -81,6 +81,8 @@ static char sCertificatePath[PATH_MAX];
 /** Cloud activation token */
 static char sActivationToken[PROXY_MAX_ACTIVATION_TOKEN_SIZE];
 
+static bool sActivationTokenSet = false;
+
 
 
 /***************** Proxyconfig Public ****************/
@@ -228,7 +230,9 @@ const char *proxyconfig_getActivationToken() {
   const char *activation = NULL;
 
   pthread_mutex_lock(&sActivationTokenMutex);
-  activation = sActivationToken;
+  if(sActivationTokenSet) {
+    activation = sActivationToken;
+  }
   pthread_mutex_unlock(&sActivationTokenMutex);
 
   return activation;
@@ -240,9 +244,16 @@ const char *proxyconfig_getActivationToken() {
  */
 void proxyconfig_setActivationToken(const char *token) {
   pthread_mutex_lock(&sActivationTokenMutex);
-  strncpy(sActivationToken, token, sizeof(sActivationToken));
+  if(token != NULL) {
+    sActivationTokenSet = true;
+    strncpy(sActivationToken, token, sizeof(sActivationToken));
+    SYSLOG_DEBUG("Authentication token set to %s", token);
+
+  } else {
+    SYSLOG_DEBUG("No authentication token in use");
+    sActivationTokenSet = false;
+  }
   pthread_mutex_unlock(&sActivationTokenMutex);
-  SYSLOG_DEBUG("Activation token set to %s", token);
 }
 
 /**
