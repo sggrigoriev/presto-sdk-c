@@ -213,6 +213,8 @@ static void *_proxyAgentThread(void *params) {
  * Handle a command from the server
  */
 static void _doCommand(command_t *cmd) {
+  iotxml_sendResult(cmd->commandId, IOT_RESULT_RECEIVED);
+
   if(strcmp(cmd->deviceId, deviceId) == 0) {
     // This command is to me
     if(strcmp(cmd->commandName, "UploadInterval") == 0) {
