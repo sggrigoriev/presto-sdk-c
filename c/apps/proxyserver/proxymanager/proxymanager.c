@@ -131,11 +131,14 @@ char * _proxymanager_getUrlFromConfigFile(char *url, int maxsize) {
  */
 char *_proxymanager_getProxyActivationKeyFromConfigFile(char *buffer, int maxsize) {
   bzero(buffer, maxsize);
-  if(libconfigio_read(proxycli_getConfigFilename(), CONFIGIO_CLOUD_ACTIVATION_KEY, buffer, maxsize) == -1) {
-    SYSLOG_ERR("For maximum security, activate your proxy to receive an auth token.\n");
-    printf("For maximum security, activate your proxy to receive an auth token.\n");
+  libconfigio_read(proxycli_getConfigFilename(), CONFIGIO_CLOUD_ACTIVATION_KEY, buffer, maxsize);
+
+  if(strlen(buffer) == 0) {
+    SYSLOG_ERR("For maximum security, activate your proxy directly to authenticate it.\n");
+    printf("For maximum security, activate your proxy directly to authenticate it.\n");
     return NULL;
   }
+
   return buffer;
 }
 
