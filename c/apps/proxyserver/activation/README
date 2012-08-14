@@ -9,6 +9,9 @@ There are 2 ways we can activate a device:
   API Documentation:
     http://developer.peoplepowerco.com/docs/?q=appapiset/deviceRegistration
   
+  Online Tool:
+    http://developer.peoplepowerco.com/docs/?q=account/activate
+    
   Description:
     This associates the device ID + device type with your user account.
     The device must have pre-programmed in it the server address, port number,
