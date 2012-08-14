@@ -57,6 +57,10 @@
 #include "libconfigio.h"
 #include "libpipecomm.h"
 
+#include "login.h"
+#include "user.h"
+#include "getactivationinfo.h"
+#include "proxyactivation.h"
 #include "ioterror.h"
 #include "iotdebug.h"
 #include "proxy.h"
@@ -65,7 +69,6 @@
 #include "proxyclientmanager.h"
 #include "proxyagent.h"
 #include "proxycli.h"
-#include "proxyactivation.h"
 #include "proxymanager.h"
 
 
@@ -103,13 +106,30 @@ int main(int argc, char *argv[]) {
   proxycli_parse(argc, argv);
 
   // If the CLI tells us to activate this proxy, then activate it and exit now.
-  if(proxycli_getActivationKey() != NULL) {
-    if(proxyactivation_activate(proxycli_getActivationKey()) == SUCCESS) {
-      printf("Activated! Exiting.\n\n");
-      SYSLOG_INFO("Activated! Exiting.\n\n");
-      exit(0);
+  if(proxycli_readyToActivate()) {
+    if(proxycli_getActivationKey() != NULL) {
+      // Activate with an activation key
+      if(proxyactivation_activate(proxycli_getActivationKey(), NULL) == SUCCESS) {
+        printf("Activated! Exiting.\n\n");
+        SYSLOG_INFO("Activated! Exiting.\n\n");
+        exit(0);
+
+      }
+
+      printf("Activation failed. Exiting.\n\n");
+      SYSLOG_ERR("Activation failed. Exiting.\n\n");
+      exit(1);
 
     } else {
+      // Activate with username and password
+      if(login_doLogin(proxycli_getUsername(), proxycli_getPassword()) == SUCCESS) {
+        if(proxyactivation_activate(getactivationinfo_getDeviceActivationKey(login_getApiKey(), user_getLocationId(login_getApiKey())), proxycli_getUsername()) == SUCCESS) {
+          printf("Activated! Exiting.\n\n");
+          SYSLOG_INFO("Activated! Exiting.\n\n");
+          exit(0);
+        }
+      }
+
       printf("Activation failed. Exiting.\n\n");
       SYSLOG_ERR("Activation failed. Exiting.\n\n");
       exit(1);

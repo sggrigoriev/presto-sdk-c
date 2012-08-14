@@ -134,8 +134,8 @@ char *_proxymanager_getProxyActivationKeyFromConfigFile(char *buffer, int maxsiz
   libconfigio_read(proxycli_getConfigFilename(), CONFIGIO_CLOUD_ACTIVATION_KEY, buffer, maxsize);
 
   if(strlen(buffer) == 0) {
-    SYSLOG_ERR("For maximum security, activate your proxy directly to authenticate it.\n");
-    printf("For maximum security, activate your proxy directly to authenticate it.\n");
+    SYSLOG_ERR("For maximum security, activate your proxy with a username and password.\n");
+    printf("For maximum security, activate your proxy with a username and password.\n");
     return NULL;
   }
 

@@ -32,32 +32,18 @@
  */
 
 
-#ifndef PROXYACTIVATION_H
-#define PROXYACTIVATION_H
+#ifndef USER_H
+#define USER_H
 
 #include <limits.h>
 #include <rpc/types.h>
 
 #include "libhttpcomm.h"
-
-enum {
-  ACTIVATION_XML_TAG_SIZE = 32,
-  ACTIVATION_XML_VALUE_SIZE = 64,
-};
-
-/** Name of the token in our config file that stores the activation url */
-#define CONFIGIO_ACTIVATION_URL_TOKEN_NAME "PROXY_ACTIVATION_URL"
-
-/**
- * Activation info to hold during XML parsing
- */
-typedef struct activation_info_t {
-      int resultCode;
-      char xmlTag[ACTIVATION_XML_TAG_SIZE];
-} activation_info_t;
+#include "ioterror.h"
+#include "iotdebug.h"
 
 /***************** Public Prototypes ****************/
-error_t proxyactivation_activate(const char *activationKey);
+int user_getLocationId(const char *key);
 
 #endif
 

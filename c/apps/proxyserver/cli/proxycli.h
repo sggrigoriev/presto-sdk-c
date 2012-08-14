@@ -47,5 +47,11 @@ const char *proxycli_getActivationKey();
 
 const char *proxycli_getConfigFilename();
 
+const char *proxycli_getUsername();
+
+const char *proxycli_getPassword();
+
+const bool proxycli_readyToActivate();
+
 #endif
 

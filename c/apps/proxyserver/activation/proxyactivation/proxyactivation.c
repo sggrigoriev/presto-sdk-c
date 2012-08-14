@@ -84,11 +84,13 @@ static void _proxyactivation_xml_charactersHandler(void *ctx, const xmlChar *ch,
  * We obtain the device type and activation URL from the configuration file
  *
  * @param activationKey the key to activate with
+ * @param optionalUsername the username we activated with, or NULL
  * @return SUCCESS if the proxy was activated, FAIL if it wasn't
  */
-error_t proxyactivation_activate(const char *activationKey) {
+error_t proxyactivation_activate(const char *activationKey, const char *optionalUsername) {
   char eui64[EUI64_STRING_SIZE];
   char url[PATH_MAX];
+  char baseUrl[PATH_MAX];
   char deviceType[8];
   char rxBuffer[PROXY_MAX_MSG_LEN];
   char oBuffer[PROXY_MAX_MSG_LEN];
@@ -130,10 +132,10 @@ error_t proxyactivation_activate(const char *activationKey) {
   }
 
   // Read the activation URL from the configuration file
-  if(libconfigio_read(proxycli_getConfigFilename(), CONFIGIO_ACTIVATION_URL_TOKEN_NAME, url, sizeof(url)) == -1) {
+  if(libconfigio_read(proxycli_getConfigFilename(), CONFIGIO_ACTIVATION_URL_TOKEN_NAME, baseUrl, sizeof(baseUrl)) == -1) {
     printf("Couldn't read %s in file %s, writing default value\n", CONFIGIO_ACTIVATION_URL_TOKEN_NAME, proxycli_getConfigFilename());
     libconfigio_write(proxycli_getConfigFilename(), CONFIGIO_ACTIVATION_URL_TOKEN_NAME, DEFAULT_ACTIVATION_URL);
-    strncpy(url, DEFAULT_ACTIVATION_URL, sizeof(url));
+    strncpy(baseUrl, DEFAULT_ACTIVATION_URL, sizeof(baseUrl));
   }
 
   // Read the device type from the configuration file
@@ -142,6 +144,11 @@ error_t proxyactivation_activate(const char *activationKey) {
     libconfigio_write(proxycli_getConfigFilename(), CONFIGIO_PROXY_DEVICE_TYPE_TOKEN_NAME, DEFAULT_PROXY_DEVICETYPE);
     strncpy(deviceType, DEFAULT_PROXY_DEVICETYPE, sizeof(deviceType));
   }
+
+  snprintf(url, sizeof(url), "%s/hubActivation", baseUrl);
+
+  SYSLOG_INFO("Activation...");
+  SYSLOG_INFO("Contacting URL %s\n", url);
 
   snprintf(oBuffer, sizeof(oBuffer), "<request>\n"
     "<hubActivation>\n"
@@ -157,14 +164,16 @@ error_t proxyactivation_activate(const char *activationKey) {
 
   libhttpcomm_sendMsg(NULL, CURLOPT_POST, url, NULL, NULL, oBuffer, strlen(oBuffer), rxBuffer, sizeof(rxBuffer), params, NULL);
 
-  printf("Server returned: \n%s\n", rxBuffer);
+  SYSLOG_INFO("Server returned: \n%s\n", rxBuffer);
 
   if(0 != xmlSAXUserParseMemory(&saxHandler, &activationInfo, rxBuffer, strlen(rxBuffer))) {
     return FAIL;
   }
 
   if(activationInfo.resultCode == 0) {
-    libconfigio_write(proxycli_getConfigFilename(), CONFIGIO_PROXY_ACTIVATION_KEY, activationKey);
+    if(optionalUsername != NULL) {
+      libconfigio_write(proxycli_getConfigFilename(), CONFIGIO_PROXY_ACTIVATION_USERNAME, optionalUsername);
+    }
     return SUCCESS;
 
   } else {

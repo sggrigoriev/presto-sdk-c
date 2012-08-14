@@ -59,6 +59,11 @@ static char *activationKey;
 /** Configuration file containing non-volatile proxy information */
 static char configFilename[PROXYCLI_CONFIG_FILE_PATH_SIZE];
 
+/** Activation username */
+static char *username;
+
+/** Activation password */
+static char *password;
 
 /***************** Private Prototypes ****************/
 static void _proxycli_printUsage();
@@ -74,7 +79,7 @@ void proxycli_parse(int argc, char *argv[]) {
 
   strncpy(configFilename, DEFAULT_PROXY_CONFIG_FILENAME, PROXYCLI_CONFIG_FILE_PATH_SIZE);
 
-  while ((c = getopt(argc, argv, "c:p:a:v")) != -1) {
+  while ((c = getopt(argc, argv, "u:p:c:n:a:v")) != -1) {
     switch (c) {
     case 'c':
       strncpy(configFilename, optarg, PROXYCLI_CONFIG_FILE_PATH_SIZE);
@@ -82,7 +87,7 @@ void proxycli_parse(int argc, char *argv[]) {
       SYSLOG_INFO("[cli] Proxy config file set to %s", configFilename);
       break;
 
-    case 'p':
+    case 'n':
       // Set the port number
       port = atoi(optarg);
       break;
@@ -92,6 +97,18 @@ void proxycli_parse(int argc, char *argv[]) {
       activationKey = optarg;
       printf("[cli] Activating with key %s\n", activationKey);
       SYSLOG_INFO("[cli] Activating with key %s", activationKey);
+      break;
+
+    case 'u':
+      username = optarg;
+      printf("[cli] Username set to %s\n", username);
+      SYSLOG_INFO("[cli] Username set to %s\n", username);
+      break;
+
+    case 'p':
+      password = optarg;
+      printf("[cli] Password captured\n");
+      SYSLOG_INFO("[cli] Password captured\n");
       break;
 
     case 'v':
@@ -135,6 +152,35 @@ const char *proxycli_getConfigFilename() {
   return configFilename;
 }
 
+/**
+ * @return The activation username
+ */
+const char *proxycli_getUsername() {
+  return username;
+}
+
+/**
+ * @return The activation password
+ */
+const char *proxycli_getPassword() {
+  return password;
+}
+
+/**
+ * @return true if we have enough information to activate
+ */
+const bool proxycli_readyToActivate() {
+  if(username != NULL && password != NULL) {
+    return true;
+  }
+
+  if(activationKey != NULL) {
+    return true;
+  }
+
+  return false;
+}
+
 /***************** Private Functions ****************/
 /**
  * Instruct the user how to use the application
@@ -142,9 +188,11 @@ const char *proxycli_getConfigFilename() {
 static void _proxycli_printUsage() {
   char *usage = ""
     "Usage: ./proxyserver (options)\n"
-    "\t[-p port] : Define the port to open the proxy on\n"
+    "\t[-u username] : Activation username\n"
+    "\t[-p password] : Activation password\n"
+    "\t[-n port] : Define the port to open the proxy on\n"
     "\t[-c filename] : The name of the configuration file for the proxy\n"
-    "\t[-a key] : Activate this proxy using the given activation key and exit\n"
+    //"\t[-a key] : Activate this proxy using the given activation key and exit\n"
     "\t[-v] : Print version information\n"
     "\t[-?] : Print this menu\n";
 
