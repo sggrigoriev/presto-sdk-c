@@ -13,8 +13,8 @@ all:
 	done
 	
 	# TODO fix library paths in dependents to point to this relative directory
-	# You shoud run this command manually when it complains about -lppcsocket
-	# sudo ln -s -f ${PPCHUBDIR}/lib/libppcsocket/libppsocket.so /lib/libppcsocket.so
+	# You shoud run this command manually when it complains about any [driver.so]
+	# sudo ln -s -f ${IOTSDK}/c/lib/[driver.so] /lib/[driver.so]
 
 clean:
 	for d in $(SUBTARGETS); do \
