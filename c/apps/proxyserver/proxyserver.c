@@ -105,6 +105,9 @@ int main(int argc, char *argv[]) {
   // Parse the command line arguments
   proxycli_parse(argc, argv);
 
+  printf("Using configuration file %s\n", proxycli_getConfigFilename());
+  SYSLOG_INFO("Using configuration file %s", proxycli_getConfigFilename());
+
   // If the CLI tells us to activate this proxy, then activate it and exit now.
   if(proxycli_readyToActivate()) {
     if(proxycli_getActivationKey() != NULL) {

@@ -194,7 +194,9 @@ static void _proxycli_printUsage() {
     "\t[-c filename] : The name of the configuration file for the proxy\n"
     //"\t[-a key] : Activate this proxy using the given activation key and exit\n"
     "\t[-v] : Print version information\n"
-    "\t[-?] : Print this menu\n";
+    "\t[-?] : Print this menu\n"
+    "\n"
+    "\tUse the syslogs (usually /var/log/messages) to check the runtime status.\n";
 
   printf("%s", usage);
   SYSLOG_INFO("%s", usage);
