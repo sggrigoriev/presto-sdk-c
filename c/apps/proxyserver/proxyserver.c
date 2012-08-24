@@ -70,6 +70,7 @@
 #include "proxyagent.h"
 #include "proxycli.h"
 #include "proxymanager.h"
+#include "eui64.h"
 
 
 
@@ -95,6 +96,7 @@ int main(int argc, char *argv[]) {
   socklen_t clientLen;
   struct sockaddr_in serverAddress;
   struct sockaddr_in clientAddress;
+  char eui64[EUI64_STRING_SIZE];
 
   // Ignore the SIGCHLD signal to get rid of zombies
   signal(SIGCHLD, SIG_IGN);
@@ -175,6 +177,10 @@ int main(int argc, char *argv[]) {
   // Finally, the following loop accepts new client socket connections
   SYSLOG_INFO("Proxy running; port=%d; pid=%d\n", proxycli_getPort(), getpid());
   printf("Proxy running; port=%d; pid=%d\n", proxycli_getPort(), getpid());
+
+  eui64_toString(eui64, sizeof(eui64));
+  printf("The proxy device ID is %s\n", eui64);
+  SYSLOG_INFO("The proxy device ID is %s\n", eui64);
 
   while (!gTerminate) {
     clientSocketFd = accept(sockfd, (struct sockaddr *) &clientAddress, &clientLen);
