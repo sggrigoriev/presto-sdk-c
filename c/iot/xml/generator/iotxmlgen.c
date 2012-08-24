@@ -205,6 +205,7 @@ error_t iotxml_send(char *destMsg, int maxSize) {
         paramTypeMap[lastParamType]);
   }
 
+  SYSLOG_INFO("Send: %s\n", destMsg);
   lastParamType = -1;
   inProgress = false;
   return application_send(destMsg, strlen(destMsg));
