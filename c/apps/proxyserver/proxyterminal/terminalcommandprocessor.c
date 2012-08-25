@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 People Power Co.
+ * Copyright (c) 2010 People Power Company
  * All rights reserved.
  *
  * This open source code was developed with funding from People Power Company
@@ -31,31 +31,39 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE
  */
 
-#ifndef PROXY_H
-#define PROXY_H
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <signal.h>
+#include <sys/ioctl.h>
+#include <stdbool.h>
+
+#include "terminalcommandprocessor.h"
+#include "proxyterminal.h"
 #include "ioterror.h"
-#include "proxylisteners.h"
+#include "iotdebug.h"
+#include "proxy.h"
 
-enum {
-  PROXY_MAX_HTTP_RETRIES = 3,
-  PROXY_MAX_MSG_LEN = 8192,
-  PROXY_NUM_SERVER_CONNECTIONS_BEFORE_SYSLOG_NOTIFICATION = 20,
-  PROXY_MAX_PUSHES_ON_RECEIVED_COMMAND = 2,
-};
+/***************** Public Functions *****************/
 
-/**************** Public Prototypes ****************/
-error_t proxy_start(const char *url);
+/**
+ * Process commands from the terminal socket.
+ * See the comments at the top of proxyterinal.c for a list of valid commands.
+ */
+void terminalcommandprocessor_execute(const char *message, int length, int socketFd) {
+  SYSLOG_INFO("Terminal received: %s\n", message);
 
-void proxy_stop();
+  if(strcmp(message, "send") == 0) {
+    proxy_sendNow();
+    proxyterminal_respond("OK", 2, socketFd);
 
-error_t proxy_addListener(proxylistener l);
+  } else {
+    proxyterminal_respond("FAIL : Unknown command", 22, socketFd);
+  }
 
-error_t proxy_removeListener(proxylistener l);
-
-error_t proxy_send(const char *data, int len);
-
-void proxy_sendNow();
-
-#endif
-
+}

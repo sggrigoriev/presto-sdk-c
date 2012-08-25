@@ -70,6 +70,7 @@
 #include "proxyagent.h"
 #include "proxycli.h"
 #include "proxymanager.h"
+#include "proxyterminal.h"
 #include "eui64.h"
 
 
@@ -167,7 +168,7 @@ int main(int argc, char *argv[]) {
 
   if (bind(sockfd, (struct sockaddr *) &serverAddress, sizeof(serverAddress)) < 0) {
     SYSLOG_ERR("ERROR on binding");
-    printf("Could not bind to port\n");
+    printf("Could not bind to port %d\n", proxycli_getPort());
     exit(1);
   }
 
@@ -177,6 +178,10 @@ int main(int argc, char *argv[]) {
   // Finally, the following loop accepts new client socket connections
   SYSLOG_INFO("Proxy running; port=%d; pid=%d\n", proxycli_getPort(), getpid());
   printf("Proxy running; port=%d; pid=%d\n", proxycli_getPort(), getpid());
+
+#if ACCEPT_COMMANDS_OVER_NETWORK
+  proxyterminal_start();
+#endif
 
   eui64_toString(eui64, sizeof(eui64));
   printf("The proxy device ID is %s\n", eui64);

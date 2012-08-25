@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 People Power Co.
+ * Copyright (c) 2010 People Power Company
  * All rights reserved.
  *
  * This open source code was developed with funding from People Power Company
@@ -31,31 +31,20 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE
  */
 
-#ifndef PROXY_H
-#define PROXY_H
+#ifndef PROXYTERMINAL_H
+#define PROXYTERMINAL_H
 
 #include "ioterror.h"
-#include "proxylisteners.h"
 
-enum {
-  PROXY_MAX_HTTP_RETRIES = 3,
-  PROXY_MAX_MSG_LEN = 8192,
-  PROXY_NUM_SERVER_CONNECTIONS_BEFORE_SYSLOG_NOTIFICATION = 20,
-  PROXY_MAX_PUSHES_ON_RECEIVED_COMMAND = 2,
-};
+#ifndef TERMINAL_MAX_MSG_LEN
+#define TERMINAL_MAX_MSG_LEN 64
+#endif
 
-/**************** Public Prototypes ****************/
-error_t proxy_start(const char *url);
-
-void proxy_stop();
-
-error_t proxy_addListener(proxylistener l);
-
-error_t proxy_removeListener(proxylistener l);
-
-error_t proxy_send(const char *data, int len);
-
-void proxy_sendNow();
+/****************** Prototypes ****************/
+error_t proxyterminal_start();
+void proxyterminal_stop();
+void proxyterminal_respond(const char *message, int len, int socketFd);
 
 #endif
+
 

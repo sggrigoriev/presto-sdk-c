@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 People Power Co.
+ * Copyright (c) 2010 People Power Company
  * All rights reserved.
  *
  * This open source code was developed with funding from People Power Company
@@ -31,31 +31,72 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE
  */
 
-#ifndef PROXY_H
-#define PROXY_H
+/**
+ * This module is responsible for tracking open file descriptors so we may
+ * use them to broadcast to lister sockets
+ * @author David Moss
+ */
 
+#include <stdbool.h>
+#include <stdlib.h>
+
+#include "terminalclientmanager.h"
 #include "ioterror.h"
-#include "proxylisteners.h"
+#include "iotdebug.h"
 
-enum {
-  PROXY_MAX_HTTP_RETRIES = 3,
-  PROXY_MAX_MSG_LEN = 8192,
-  PROXY_NUM_SERVER_CONNECTIONS_BEFORE_SYSLOG_NOTIFICATION = 20,
-  PROXY_MAX_PUSHES_ON_RECEIVED_COMMAND = 2,
-};
+/** Array of clients, 1 element per open client socket */
+terminal_client_t clients[TERMINALCLIENTMANAGER_CLIENTS];
 
-/**************** Public Prototypes ****************/
-error_t proxy_start(const char *url);
 
-void proxy_stop();
+/**
+ * Add a client socket
+ * @param fd File descriptor to add
+ * @return SUCCESS if the client was added
+ */
+error_t terminalclientmanager_add(int fd) {
+  int i;
+  SYSLOG_DEBUG("Add %d", fd);
+  for(i = 0; i < TERMINALCLIENTMANAGER_CLIENTS; i++) {
+    if(!clients[i].inUse) {
+      clients[i].inUse = true;
+      clients[i].fd = fd;
+      return SUCCESS;
+    }
+  }
 
-error_t proxy_addListener(proxylistener l);
+  return FAIL;
+}
 
-error_t proxy_removeListener(proxylistener l);
+/**
+ * Remove the file descriptor from the list we're tracking
+ * @param fd File descriptor
+ */
+void terminalclientmanager_remove(int fd) {
+  int i;
+  SYSLOG_DEBUG("Remove %d", fd);
+  for(i = 0; i < TERMINALCLIENTMANAGER_CLIENTS; i++) {
+    if(clients[i].fd == fd) {
+      clients[i].inUse = false;
+    }
+  }
+}
 
-error_t proxy_send(const char *data, int len);
+/**
+ * @return the number of elements in our terminal_client_t array
+ */
+int terminalclientmanager_size() {
+  return TERMINALCLIENTMANAGER_CLIENTS;
+}
 
-void proxy_sendNow();
-
-#endif
+/**
+ * @param index Index into the array of clients
+ * @return the array of terminal_client_t's
+ */
+terminal_client_t *terminalclientmanager_get(int index) {
+  if(index < TERMINALCLIENTMANAGER_CLIENTS) {
+    return &clients[index];
+  } else {
+    return NULL;
+  }
+}
 

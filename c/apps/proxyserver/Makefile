@@ -21,6 +21,10 @@ SOURCES_C += ./activation/login/login.c
 SOURCES_C += ./activation/user/user.c
 SOURCES_C += ./activation/getactivationinfo/getactivationinfo.c
 SOURCES_C += ./proxymanager/proxymanager.c
+SOURCES_C += ./proxyterminal/proxyterminal.c
+SOURCES_C += ./proxyterminal/terminalclientmanager.c
+SOURCES_C += ./proxyterminal/terminalcommandprocessor.c
+
 
 SOURCES_C += ../../iot/proxy/proxy.c
 SOURCES_C += ../../iot/proxy/proxylisteners.c
@@ -49,6 +53,7 @@ CFLAGS += -I./activation/login
 CFLAGS += -I./activation/user
 CFLAGS += -I./activation/getactivationinfo
 CFLAGS += -I./proxymanager
+CFLAGS += -I./proxyterminal
 CFLAGS += -I../../iot/proxy 
 CFLAGS += -I../../iot/eui64 
 CFLAGS += -I../../iot/utils

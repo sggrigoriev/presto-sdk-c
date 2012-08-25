@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 People Power Co.
+ * Copyright (c) 2010 People Power Company
  * All rights reserved.
  *
  * This open source code was developed with funding from People Power Company
@@ -31,31 +31,35 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE
  */
 
-#ifndef PROXY_H
-#define PROXY_H
+#ifndef TERMINALCLIENTMANAGER_H
+#define TERMINALCLIENTMANAGER_H
+
+#include <stdbool.h>
 
 #include "ioterror.h"
-#include "proxylisteners.h"
 
-enum {
-  PROXY_MAX_HTTP_RETRIES = 3,
-  PROXY_MAX_MSG_LEN = 8192,
-  PROXY_NUM_SERVER_CONNECTIONS_BEFORE_SYSLOG_NOTIFICATION = 20,
-  PROXY_MAX_PUSHES_ON_RECEIVED_COMMAND = 2,
-};
-
-/**************** Public Prototypes ****************/
-error_t proxy_start(const char *url);
-
-void proxy_stop();
-
-error_t proxy_addListener(proxylistener l);
-
-error_t proxy_removeListener(proxylistener l);
-
-error_t proxy_send(const char *data, int len);
-
-void proxy_sendNow();
-
+#ifndef TERMINALCLIENTMANAGER_CLIENTS
+#define TERMINALCLIENTMANAGER_CLIENTS 30
 #endif
 
+/** Definition of a terminal client to track active listener sockets */
+typedef struct terminal_client_t {
+
+  /** File descriptor */
+  int fd;
+
+  /** True if this element is in use */
+  bool inUse;
+
+} terminal_client_t;
+
+/***************** Public Prototypes *****************/
+error_t terminalclientmanager_add(int fd);
+
+void terminalclientmanager_remove(int fd);
+
+int terminalclientmanager_size();
+
+terminal_client_t *terminalclientmanager_get(int i);
+
+#endif
