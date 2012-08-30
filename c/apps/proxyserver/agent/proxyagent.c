@@ -213,6 +213,13 @@ static void *_proxyAgentThread(void *params) {
  * Handle a command from the server
  */
 static void _doCommand(command_t *cmd) {
+  if(cmd->commandId == -1) {
+    // This is a notification that there are no more commands, ignore it and
+    // don't acknowledge it.
+    return;
+  }
+
+  // Always notify the cloud that the hub received the command
   iotxml_sendResult(cmd->commandId, IOT_RESULT_RECEIVED);
 
   if(strcmp(cmd->deviceId, deviceId) == 0) {

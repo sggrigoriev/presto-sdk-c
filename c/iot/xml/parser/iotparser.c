@@ -176,6 +176,13 @@ static void _iotparser_xml_endElementHandler(void *ctx, const xmlChar *name) {
     // Send out a command to all listeners that there are no more commands
     // This is useful when we might receive several commands that we buffered
     // up because they need to execute simultaneously
+    //
+    // Most modules should just ignore commands with
+    // ID -1 or noMoreCommands=true
+    //
+    // Devices like a multi-socket powerstrip might be interested in this
+    // because it would send a single command to the end device telling it
+    // to switch multiple sockets at once.
     command->noMoreCommands = true;
     bzero(command->deviceId, EUI64_STRING_SIZE);
     bzero(command->commandName, IOT_COMMAND_NAME_STRING_SIZE);
