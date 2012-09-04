@@ -67,7 +67,6 @@
 #include "proxyserver.h"
 #include "proxyterminal.h"
 #include "terminalcommandprocessor.h"
-#include "terminalclientmanager.h"
 #include "iotapi.h"
 
 /** Thread termination flag */
@@ -131,8 +130,8 @@ void proxyterminal_stop() {
 void proxyterminal_respond(const char *message, int len, int socketFd) {
   if (libpipecomm_write(socketFd, message, len) < 0) {
     SYSLOG_ERR("ERROR writing to socket %d, closing socket", socketFd);
-    terminalclientmanager_remove(socketFd);
     close(socketFd);
+    exit(0); // from the forked thread
   }
 }
 
@@ -178,34 +177,24 @@ static void *_terminalThread(void *params) {
       continue;
     }
 
-    if (terminalclientmanager_add(clientSocketFd) != SUCCESS) {
-      SYSLOG_ERR("[%d]: Out of client elements to track sockets", getpid());
-      close(clientSocketFd);
+
+    pid = fork();
+    if (pid < 0) {
+      SYSLOG_ERR("ERROR on fork");
+
+    } else if (pid == 0) {
+      // Child process
+      SYSLOG_INFO("[%d]: New client listener created", getpid());
+      close(sockfd);
+      _proxyterminal_processMessage(clientSocketFd);
+      SYSLOG_INFO("[%d]: Destroying Terminal Client Thread", getpid());
+      exit(0);
 
     } else {
-      pid = fork();
-      if (pid < 0) {
-        SYSLOG_ERR("ERROR on fork");
+      // Parent process
 
-      } else if (pid == 0) {
-        // Child process
-        SYSLOG_INFO("[%d]: New client listener created", getpid());
-        close(sockfd);
-        while (true) {
-          // Read messages from the client until the socket is closed
-          _proxyterminal_processMessage(clientSocketFd);
-          sleep(1);
-        }
-
-        terminalclientmanager_remove(clientSocketFd);
-        SYSLOG_INFO("[%d]: Destroyed", getpid());
-        exit(0);
-
-      } else {
-        // Parent process
-
-      }
     }
+
   }
 
   SYSLOG_INFO("*** Exiting Terminal Thread ***");
@@ -229,13 +218,11 @@ void  _proxyterminal_processMessage(int clientSocketFd) {
 
   } else if(length == 0) {
     SYSLOG_ERR("[%d]: Socket killed, destroying thread", getpid());
-    terminalclientmanager_remove(clientSocketFd);
     close(clientSocketFd);
     exit(0);
 
   } else {
     SYSLOG_ERR("[%d]: Error reading from socket, destroying thread", getpid());
-    terminalclientmanager_remove(clientSocketFd);
     close(clientSocketFd);
     exit(0);
   }

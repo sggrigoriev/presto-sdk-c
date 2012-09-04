@@ -22,7 +22,6 @@ SOURCES_C += ./activation/user/user.c
 SOURCES_C += ./activation/getactivationinfo/getactivationinfo.c
 SOURCES_C += ./proxymanager/proxymanager.c
 SOURCES_C += ./proxyterminal/proxyterminal.c
-SOURCES_C += ./proxyterminal/terminalclientmanager.c
 SOURCES_C += ./proxyterminal/terminalcommandprocessor.c
 
 
