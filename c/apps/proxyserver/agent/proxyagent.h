@@ -42,16 +42,16 @@
 #endif
 
 /** Parameter name for the firmware version */
-#define PARAM_NAME_FIRMWARE_VERSION "FW"
+#define PARAM_NAME_FIRMWARE_VERSION "firmware"
 
 /** Parameter name for the amount of time this proxy has been active */
-#define PARAM_NAME_ALIVE_TIME "AliveTime"
+#define PARAM_NAME_ALIVE_TIME "aliveTime"
 
 /** Parameter name for the number of times the proxy has restarted */
-#define PARAM_NAME_REBOOTS "NoOfReboots"
+#define PARAM_NAME_REBOOTS "reboots"
 
 /** Parameter name for the passive upload interval of the proxy */
-#define PARAM_NAME_UPLOAD_INTERVAL "UploadInterval"
+#define PARAM_NAME_UPLOAD_INTERVAL "uploadInterval"
 
 
 /***************** Public Prototypes ****************/

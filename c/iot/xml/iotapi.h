@@ -55,7 +55,7 @@ enum {
  * Param types enumerator
  */
 typedef enum param_type_e {
-  IOT_PARAM_PROFILE,
+  IOT_PARAM_PROFILE,  // deprecated
   IOT_PARAM_MEASURE,
   IOT_PARAM_ALERT,
 } param_type_e;
