@@ -130,7 +130,7 @@ int iotxml_addString(char *dest, int maxSize, const char *deviceId, int deviceTy
     offset += snprintf(dest + offset, maxSize - offset,
         "<%s deviceId=\"%s\" timestamp=\"",
         paramTypeMap[lastParamType],
-        deviceType);
+        deviceId);
 
     offset += getTimestamp(dest + offset, maxSize - offset);
 
