@@ -277,7 +277,7 @@ static void *_serverCommThread(void *params) {
       }
 
       if(strstr(sMsgToServer, "p=\"1\"") != NULL) {
-        // sendMeasurementNow()
+        // pushMeasurementNow
         break;
       }
 
@@ -427,7 +427,7 @@ static void _serverCommPush(CURLSH *curlHandle, char *message, char *response, i
 
     proxyconfig_getUrl(url, sizeof(url));
 
-    SYSLOG_DEBUG("POST URL: %s", url);
+    SYSLOG_INFO("POST URL: %s", url);
 
     if (libhttpcomm_sendMsg(curlHandle, CURLOPT_POST, url,
         proxyconfig_getCertificate(), proxyconfig_getActivationToken(), wrappedMessage,
@@ -526,6 +526,12 @@ int _httpProgressCallback(void *clientp, double dltotal, double dlnow, double ul
       // Pipe is empty or had an error reading it... stop reading.
       break;
     }
+
+    if(strstr(sMsgToServer, "p=\"1\"") != NULL) {
+      // pushMeasurementNow found
+      return true;
+    }
+
     usleep(2000);
   }
 

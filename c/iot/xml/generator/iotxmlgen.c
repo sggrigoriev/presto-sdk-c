@@ -265,6 +265,7 @@ error_t iotxml_alertDeviceIsGone(const char *deviceId) {
  * Push measurements now.  This is a cloud- and iotsdk-friendly way to get
  * a p="1" string through a few sockets and buffers into the outbound message,
  * which will trigger the proxy to dump the entire contents of the buffer now.
+ * This works because the server ignores the p="1" attribute
  *
  * @param deviceId the unique ID of the measurement to push now
  * @return SUCCESS if we will push the measurement now
