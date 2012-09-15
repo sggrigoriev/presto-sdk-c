@@ -158,5 +158,6 @@ error_t iotxml_addCommandListener(commandlistener_f l, char *type);
 
 error_t iotxml_removeCommandListener(commandlistener_f l);
 
+error_t iotxml_pushMeasurementNow(const char *deviceId);
 
 #endif

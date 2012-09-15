@@ -70,7 +70,6 @@
 #include "proxyagent.h"
 #include "proxycli.h"
 #include "proxymanager.h"
-#include "proxyterminal.h"
 #include "eui64.h"
 
 
@@ -178,10 +177,6 @@ int main(int argc, char *argv[]) {
   // Finally, the following loop accepts new client socket connections
   SYSLOG_INFO("Proxy running; port=%d; pid=%d\n", proxycli_getPort(), getpid());
   printf("Proxy running; port=%d; pid=%d\n", proxycli_getPort(), getpid());
-
-#if ACCEPT_COMMANDS_OVER_NETWORK
-  proxyterminal_start();
-#endif
 
   eui64_toString(eui64, sizeof(eui64));
   printf("The proxy device ID is %s\n", eui64);

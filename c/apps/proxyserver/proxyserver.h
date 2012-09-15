@@ -38,10 +38,6 @@
 #define DEFAULT_PROXY_PORT 60110
 #endif
 
-#ifndef DEFAULT_TERMINAL_PORT
-#define DEFAULT_TERMINAL_PORT 60111
-#endif
-
 #ifndef DEFAULT_PROXY_URL
 #define DEFAULT_PROXY_URL "developer.peoplepowerco.com:8080/deviceio/ml"
 #endif
@@ -57,20 +53,6 @@
 #ifndef DEFAULT_PROXY_CONFIG_FILENAME
 #define DEFAULT_PROXY_CONFIG_FILENAME "proxy.conf"
 #endif
-
-/**
- * Setting this to 1 opens up a terminal port on the proxyserver, so you can
- * connect over the network and send commands directly to the proxyserver
- * application and manage it remotely.  For instance, in some cases we have
- * clients that need to send a measurement to the server right away, and the
- * terminal gives us a hook to force the proxyserver to send those measurements.
- * Setting this to 0 will optimize the terminal out of the proxyserver for
- * a smaller code footprint.
- */
-#ifndef ACCEPT_COMMANDS_OVER_NETWORK
-#define ACCEPT_COMMANDS_OVER_NETWORK 1
-#endif
-
 
 /** Name of the token in our config file that stores the device type */
 #define CONFIGIO_PROXY_DEVICE_TYPE_TOKEN_NAME "PROXY_DEVICE_TYPE"

@@ -1,8 +1,0 @@
-This is a module for your application to connect to the terminal socket,
-provided by the proxyserver application.
-
-If this component is compiled into your application, you must implement
-the following command:
-
-  void terminal_receive(const char *msg, int len);
-

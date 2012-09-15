@@ -55,7 +55,5 @@ error_t proxy_removeListener(proxylistener l);
 
 error_t proxy_send(const char *data, int len);
 
-void proxy_sendNow();
-
 #endif
 

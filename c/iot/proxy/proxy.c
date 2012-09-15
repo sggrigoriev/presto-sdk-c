@@ -99,16 +99,6 @@ static int sProxyToServerReadFd = -1;
 /** File descriptor to write to a pipe for messages to the server */
 static int sProxyToServerWriteFd = -1;
 
-
-/** Mutex to protect command pipe */
-static pthread_mutex_t sCommandPipeMutex;
-
-/** File descriptor for a pipe that communicates commands */
-static int sCommandPipeReadFd = -1;
-
-/** File descriptor for a pipe that communicates commands */
-static int sCommandPipeWriteFd = -1;
-
 /** Buffer allocating space for message(s) to send to the server */
 static char sMsgToServer[PROXY_MAX_HTTP_SEND_MESSAGE_LEN];
 
@@ -134,12 +124,10 @@ int _httpProgressCallback(void *clientp, double dltotal, double dlnow, double ul
  */
 error_t proxy_start(const char *url) {
 	int pipeFds[2];
-	int commandPipeFds[2];
 
 	proxyconfig_start();
 	proxylisteners_start();
   pthread_mutex_init(&sProxyToServerMutex, NULL);
-  pthread_mutex_init(&sCommandPipeMutex, NULL);
 
 	if(proxyconfig_setUrl(url) != SUCCESS) {
 	  SYSLOG_ERR("Couldn't set the URL");
@@ -163,25 +151,6 @@ error_t proxy_start(const char *url) {
 	if (fcntl(sProxyToServerWriteFd, F_SETFL, O_NONBLOCK) == -1) {
 		SYSLOG_ERR("fcntl(sProxyToServerWriteFd), %s", strerror(errno));
 	}
-
-
-  // Setup the command pipe to get commands into the thread we're about to make
-  if(pipe(commandPipeFds)) {
-    SYSLOG_ERR("commandPipeFds() 3, cause:(%s)", strerror(errno));
-    return FAIL;
-  }
-
-  sCommandPipeReadFd = commandPipeFds[0];
-  sCommandPipeWriteFd = commandPipeFds[1];
-
-  if (fcntl(sCommandPipeReadFd, F_SETFL, O_NONBLOCK) == -1) {
-    SYSLOG_ERR("fcntl(sCommandPipeReadFd), %s", strerror(errno));
-  }
-
-  if (fcntl(sCommandPipeWriteFd, F_SETFL, O_NONBLOCK) == -1) {
-    SYSLOG_ERR("fcntl(sCommandPipeWriteFd), %s", strerror(errno));
-  }
-
 
   curl_global_init(CURL_GLOBAL_ALL);
 
@@ -219,7 +188,6 @@ void proxy_stop() {
   proxyconfig_stop();
   proxylisteners_stop();
   pthread_mutex_destroy(&sProxyToServerMutex);
-  pthread_mutex_destroy(&sCommandPipeMutex);
   gTerminate = true;
 }
 
@@ -265,14 +233,6 @@ error_t proxy_send(const char *data, int len) {
 }
 
 
-void proxy_sendNow() {
-  pthread_mutex_lock(&sCommandPipeMutex);
-  // Half-duplex pipe is protected for safety reasons on some deeply embedded platforms
-  libpipecomm_write(sCommandPipeWriteFd, "send", 4);
-  pthread_mutex_unlock(&sCommandPipeMutex);
-}
-
-
 /***************** Private Functions ****************/
 /**
  * Main thread function for server communication
@@ -315,6 +275,12 @@ static void *_serverCommThread(void *params) {
         // pipe is empty or obtained an error reading it -> stop reading.
         break;
       }
+
+      if(strstr(sMsgToServer, "p=\"1\"") != NULL) {
+        // sendMeasurementNow()
+        break;
+      }
+
       usleep(2000);
     }
 
@@ -539,7 +505,6 @@ int _httpProgressCallback(void *clientp, double dltotal, double dlnow, double ul
   struct timeval curTime;
   static unsigned int lastTimeoutTime = 0;
   static int count = 0;
-  char commands[8];
 
   // Periodic "Connected to server" notifications...
   if ((count++) >= PROXY_NUM_SERVER_CONNECTIONS_BEFORE_SYSLOG_NOTIFICATION) {
@@ -562,18 +527,6 @@ int _httpProgressCallback(void *clientp, double dltotal, double dlnow, double ul
       break;
     }
     usleep(2000);
-  }
-
-  // Check for any commands being sent into this thread
-  pthread_mutex_lock(&sCommandPipeMutex);
-  bzero(commands, sizeof(commands));
-  msgLen = libpipecomm_read(sCommandPipeReadFd, commands, sizeof(commands));
-  pthread_mutex_unlock(&sCommandPipeMutex);
-
-  if(strstr(commands, "send") != NULL) {
-    // Force the GET connection to close and start pushing data to the server
-    SYSLOG_DEBUG("FORCING SEND\n");
-    return true;
   }
 
   gettimeofday(&curTime, NULL);

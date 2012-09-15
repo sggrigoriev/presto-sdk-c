@@ -128,9 +128,8 @@ int iotxml_addString(char *dest, int maxSize, const char *deviceId, int deviceTy
     strncpy(lastDeviceId, deviceId, sizeof(lastDeviceId));
 
     offset += snprintf(dest + offset, maxSize - offset,
-        "<%s deviceId=\"%s\" deviceType=\"%d\" timestamp=\"",
+        "<%s deviceId=\"%s\" timestamp=\"",
         paramTypeMap[lastParamType],
-        lastDeviceId,
         deviceType);
 
     offset += getTimestamp(dest + offset, maxSize - offset);
@@ -259,5 +258,21 @@ error_t iotxml_alertDeviceIsGone(const char *deviceId) {
   bzero(xml, IOTGEN_ADD_REMOVE_XML_SIZE);
   snprintf(xml, IOTGEN_ADD_REMOVE_XML_SIZE, "<alert deviceId=\"%s\" type=\"no_read\" />", deviceId);
   SYSLOG_INFO("Alerting that device %s is gone", deviceId);
+  return application_send(xml, strlen(xml));
+}
+
+/**
+ * Push measurements now.  This is a cloud- and iotsdk-friendly way to get
+ * a p="1" string through a few sockets and buffers into the outbound message,
+ * which will trigger the proxy to dump the entire contents of the buffer now.
+ *
+ * @param deviceId the unique ID of the measurement to push now
+ * @return SUCCESS if we will push the measurement now
+ */
+error_t iotxml_pushMeasurementNow(const char *deviceId) {
+  char xml[IOTGEN_ADD_REMOVE_XML_SIZE];
+  bzero(xml, IOTGEN_ADD_REMOVE_XML_SIZE);
+  snprintf(xml, IOTGEN_ADD_REMOVE_XML_SIZE, "<measure deviceId=\"%s\" p=\"1\" />", deviceId);
+  SYSLOG_INFO("Pushing measurement for device %s now", deviceId);
   return application_send(xml, strlen(xml));
 }
