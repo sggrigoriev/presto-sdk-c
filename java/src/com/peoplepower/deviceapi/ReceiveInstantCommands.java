@@ -29,10 +29,19 @@ public class ReceiveInstantCommands extends Thread {
   private HttpURLConnection connection;
 
   /** Timeout in seconds */
-  private static final int TIMEOUT = 5;
+  private static final int TIMEOUT = 60;
 
   /** List of command listeners */
   private Set<CommandListener> listeners;
+
+
+  /**
+   * Constructor
+   */
+  public ReceiveInstantCommands() {
+    myDeviceId = MacAddress.getProxyId();
+    listeners = Collections.synchronizedSet(new HashSet<CommandListener>());
+  }
 
   /**
    * Constructor
@@ -43,6 +52,7 @@ public class ReceiveInstantCommands extends Thread {
     myDeviceId = deviceId;
     listeners = Collections.synchronizedSet(new HashSet<CommandListener>());
   }
+  
 
   public void addListener(CommandListener l) {
     listeners.add(l);
@@ -73,6 +83,8 @@ public class ReceiveInstantCommands extends Thread {
         serverAddress = new URL("http://" + Server.DOMAIN + Server.DEVICEURI
             + "?id=" + myDeviceId + "&timeout=" + TIMEOUT);
 
+        System.out.println("Persistent Connection: " + serverAddress);
+        
         // Set up the initial connection
         connection = (HttpURLConnection) serverAddress.openConnection();
         connection.setRequestMethod("GET");

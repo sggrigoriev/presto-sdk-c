@@ -17,6 +17,9 @@ public class Measurement {
   /** The device that generated this measurement */
   private String myDeviceId;
   
+  /** The device type will let us <add> this device to the server */
+  private int myDeviceType = -1;
+  
   /**
    * Constructor
    */
@@ -36,6 +39,17 @@ public class Measurement {
     myParams.add(param);
   }
   
+  /**
+   * Constructor, lets us also <add> this device to the user's account
+   * through the proxy that is already registered to the user's account
+   */
+  public Measurement(String deviceId, int deviceType) {
+    setTimestamp();
+    myDeviceId = deviceId;
+    myDeviceType = deviceType;
+    myParams = new ArrayList<Param>();
+  }
+  
   public void addParam(Param param) {
     myParams.add(param);
   }
@@ -51,6 +65,15 @@ public class Measurement {
   public String getDeviceId() {
     return myDeviceId;
   }
+  
+  public int getDeviceType() {
+    return myDeviceType;
+  }
+  
+  public boolean hasDeviceType() {
+    return myDeviceType > -1;
+  }
+  
   
   /**
    * Set the local timestamp

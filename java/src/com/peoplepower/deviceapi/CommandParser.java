@@ -67,6 +67,10 @@ public class CommandParser {
           if (attributes.getQName(i).equalsIgnoreCase("name")) {
             focusedParam.setName(attributes.getValue(i));
           }
+          
+          if (attributes.getQName(i).equalsIgnoreCase("index")) {
+            focusedParam.setIndex(attributes.getValue(i));
+          }
         }
       }
     }

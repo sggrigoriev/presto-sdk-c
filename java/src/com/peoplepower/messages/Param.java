@@ -6,6 +6,8 @@ public class Param {
   
   private String myValue;
   
+  private int myIndex = -1;
+  
   /**
    * Empty constructor
    */
@@ -21,6 +23,26 @@ public class Param {
     myName = name;
     myValue = value;
   }
+  
+  /**
+   * Constructor
+   * @param name
+   * @param value
+   */
+  public Param(String name, String value, int index) {
+    myName = name;
+    myValue = value;
+    myIndex = index;
+  }
+
+  /**
+   * 
+   * @param param
+   * @return true if the two parameters have the same name and index
+   */
+  public boolean matches(Param param) {
+    return param.getName().equals(myName) && param.getIndex() == myIndex;
+  }
 
   public void setName(String name) {
     myName = name;
@@ -28,6 +50,14 @@ public class Param {
   
   public void setValue(String value) {
     myValue = value;
+  }
+  
+  public void setIndex(String index) {
+    myIndex = Integer.parseInt(index);
+  }
+  
+  public void setIndex(int index) {
+    myIndex = index;
   }
   
   public String getName() {
@@ -38,4 +68,11 @@ public class Param {
     return myValue;
   }
   
+  public int getIndex() {
+    return myIndex;
+  }
+
+  public boolean hasIndex() {
+    return myIndex > -1;
+  }
 }

@@ -89,21 +89,32 @@ public class SendMeasurement {
    */
   private static String convertToXml(List<Measurement> measurements) {
     
-    String xml = "<?xml version=\"1.0\" encoding=\"utf-8\" ?>";
-    xml += "<h2s ver=\"2\" proxyId=\"" + MacAddress.getProxyId() + "\" seq=\"" + MessageSequenceNumber.nextSequenceNumber() + "\">";
+    String xml = "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n";
+    xml += "<h2s ver=\"2\" proxyId=\"" + MacAddress.getProxyId() + "\" seq=\"" + MessageSequenceNumber.nextSequenceNumber() + "\">\n";
     
     Measurement focusedMeasurement;
     Param focusedParameter;
     for(Iterator<Measurement> it = measurements.iterator(); it.hasNext(); ) {
       focusedMeasurement = (Measurement) it.next();
-      xml += "<measure deviceId=\"" + focusedMeasurement.getDeviceId() + "\" timestamp=\"" + focusedMeasurement.getTimestamp() + "\">";
+      
+      if(focusedMeasurement.hasDeviceType()) {
+        xml += "\t<add deviceId=\"" + focusedMeasurement.getDeviceId() + "\" deviceType=\"" + focusedMeasurement.getDeviceType() + "\"/>\n";
+      }
+      
+      xml += "\t<measure deviceId=\"" + focusedMeasurement.getDeviceId() + "\" timestamp=\"" + focusedMeasurement.getTimestamp() + "\">\n";
       
       for(Iterator<Param> paramIterator = focusedMeasurement.iterator(); paramIterator.hasNext(); ) {
         focusedParameter = (Param) paramIterator.next();
-        xml += "<param name=\"" + focusedParameter.getName() + "\">" + focusedParameter.getValue() + "</param>";
+        xml += "\t\t<param name=\"" + focusedParameter.getName() + "\"";
+        
+        if(focusedParameter.hasIndex()) {
+          xml += " index=\"" + focusedParameter.getIndex() + "\"";
+        }
+        
+        xml += ">" + focusedParameter.getValue() + "</param>\n";
       }
       
-      xml += "</measure>";
+      xml += "\t</measure>\n";
     }
     
     xml += "</h2s>\n";
