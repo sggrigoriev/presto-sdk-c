@@ -256,7 +256,7 @@ error_t iotxml_addDevice(const char *deviceId, int deviceType) {
 error_t iotxml_alertDeviceIsGone(const char *deviceId) {
   char xml[IOTGEN_ADD_REMOVE_XML_SIZE];
   bzero(xml, IOTGEN_ADD_REMOVE_XML_SIZE);
-  snprintf(xml, IOTGEN_ADD_REMOVE_XML_SIZE, "<alert deviceId=\"%s\" type=\"no_read\" />", deviceId);
+  snprintf(xml, IOTGEN_ADD_REMOVE_XML_SIZE, "<alert deviceId=\"%s\" type=\"noRead\" />", deviceId);
   SYSLOG_INFO("Alerting that device %s is gone", deviceId);
   return application_send(xml, strlen(xml));
 }
