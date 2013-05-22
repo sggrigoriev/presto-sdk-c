@@ -1,4 +1,3 @@
-
 /*
  *  Copyright 2013 People Power Company
  *  
@@ -16,3 +15,31 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+
+
+#ifndef PROXYACTIVATION_H
+#define PROXYACTIVATION_H
+
+#include <limits.h>
+#include <rpc/types.h>
+
+#include "libhttpcomm.h"
+
+enum {
+  ACTIVATION_XML_TAG_SIZE = 32,
+  ACTIVATION_XML_VALUE_SIZE = 64,
+};
+
+/**
+ * Activation info to hold during XML parsing
+ */
+typedef struct activation_info_t {
+      int resultCode;
+      char xmlTag[ACTIVATION_XML_TAG_SIZE];
+} activation_info_t;
+
+/***************** Public Prototypes ****************/
+error_t proxyactivation_activate(const char *activationKey, const char *optionalUsername);
+
+#endif
+

@@ -1,4 +1,3 @@
-
 /*
  *  Copyright 2013 People Power Company
  *  
@@ -16,3 +15,16 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+
+
+#ifndef GADGETCONTROL_H
+#define GADGETCONTROL_H
+
+#include "iotapi.h"
+
+/***************** Public Prototypes ****************/
+void gadgetcontrol_execute(command_t *cmd);
+
+void gadgetcontrol_synchronizeTimes();
+
+#endif

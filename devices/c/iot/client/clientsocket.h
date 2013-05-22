@@ -1,4 +1,3 @@
-
 /*
  *  Copyright 2013 People Power Company
  *  
@@ -16,3 +15,27 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+
+#ifndef CLIENTSOCKET_H
+#define CLIENTSOCKET_H
+
+#include <stdbool.h>
+#include "ioterror.h"
+
+enum {
+  CLIENTSOCKET_INBOUND_MSGSIZE = 4096,
+};
+
+/** The developer must implement this function in the application */
+void application_receive(const char *msg, int len);
+
+/***************** Public Prototypes ****************/
+error_t clientsocket_open(const char *serverName, int port);
+
+error_t clientsocket_close();
+
+error_t clientsocket_send(const char *msg, int len);
+
+
+#endif
+

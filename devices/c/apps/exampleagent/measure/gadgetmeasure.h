@@ -1,4 +1,3 @@
-
 /*
  *  Copyright 2013 People Power Company
  *  
@@ -16,3 +15,16 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+
+
+#ifndef GADGETMEASURE_H
+#define GADGETMEASURE_H
+
+
+/***************** Public Prototypes ****************/
+void gadgetmeasure_capture();
+
+void gadgetmeasure_send();
+
+#endif
+

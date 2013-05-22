@@ -1,4 +1,3 @@
-
 /*
  *  Copyright 2013 People Power Company
  *  
@@ -16,3 +15,24 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+ 
+/**
+ * @author David Moss
+ */
+
+#ifndef IOTERROR_H
+#define IOTERROR_H
+
+#include <errno.h>
+
+#ifndef __error_t_defined
+typedef int error_t;
+#define __error_t_defined 1
+#endif
+
+enum {
+  SUCCESS        =  0,
+  FAIL           =  1,
+};
+
+#endif

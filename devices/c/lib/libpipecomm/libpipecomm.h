@@ -1,4 +1,3 @@
-
 /*
  *  Copyright 2013 People Power Company
  *  
@@ -16,3 +15,18 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+
+#ifndef LIBPIPECOMM_H
+#define LIBPIPECOMM_H
+
+#include <rpc/types.h>
+
+/***************** Public Prototypes ****************/
+int libpipecomm_open(const char* pipeName, bool_t isBlocking);
+
+int libpipecomm_write(int fd, const char *msg, uint16_t msgLen);
+
+int libpipecomm_read(int fd, char *msg, uint16_t maxLen);
+
+#endif
+

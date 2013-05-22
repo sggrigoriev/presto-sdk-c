@@ -1,4 +1,3 @@
-
 /*
  *  Copyright 2013 People Power Company
  *  
@@ -16,3 +15,31 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+
+
+#ifndef GETACTIVATIONINFO_H
+#define GETACTIVATIONINFO_H
+
+#include <limits.h>
+#include <rpc/types.h>
+
+#include "libhttpcomm.h"
+
+enum {
+  ACTIVATION_KEY_LENGTH = 256,
+  GETACTIVATIONINFO_XML_TAG_SIZE = 32,
+};
+
+/**
+ * Activation info to hold during XML parsing
+ */
+typedef struct getactivationinfo_info_t {
+      int resultCode;
+      char xmlTag[GETACTIVATIONINFO_XML_TAG_SIZE];
+} getactivationinfo_info_t;
+
+/***************** Public Prototypes ****************/
+char *getactivationinfo_getDeviceActivationKey(const char *key, int locationId);
+
+#endif
+

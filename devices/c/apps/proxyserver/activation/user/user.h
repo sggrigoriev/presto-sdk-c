@@ -1,4 +1,3 @@
-
 /*
  *  Copyright 2013 People Power Company
  *  
@@ -16,3 +15,20 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+
+
+#ifndef USER_H
+#define USER_H
+
+#include <limits.h>
+#include <rpc/types.h>
+
+#include "libhttpcomm.h"
+#include "ioterror.h"
+#include "iotdebug.h"
+
+/***************** Public Prototypes ****************/
+int user_getLocationId(const char *key);
+
+#endif
+

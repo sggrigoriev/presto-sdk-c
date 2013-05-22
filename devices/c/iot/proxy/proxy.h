@@ -1,4 +1,3 @@
-
 /*
  *  Copyright 2013 People Power Company
  *  
@@ -16,3 +15,30 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+
+#ifndef PROXY_H
+#define PROXY_H
+
+#include "ioterror.h"
+#include "proxylisteners.h"
+
+enum {
+  PROXY_MAX_HTTP_RETRIES = 3,
+  PROXY_MAX_MSG_LEN = 8192,
+  PROXY_NUM_SERVER_CONNECTIONS_BEFORE_SYSLOG_NOTIFICATION = 20,
+  PROXY_MAX_PUSHES_ON_RECEIVED_COMMAND = 2,
+};
+
+/**************** Public Prototypes ****************/
+error_t proxy_start(const char *url);
+
+void proxy_stop();
+
+error_t proxy_addListener(proxylistener l);
+
+error_t proxy_removeListener(proxylistener l);
+
+error_t proxy_send(const char *data, int len);
+
+#endif
+

@@ -1,4 +1,3 @@
-
 /*
  *  Copyright 2013 People Power Company
  *  
@@ -16,3 +15,26 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+
+#ifndef IOTCOMMANDLISTENERS_H
+#define IOTCOMMANDLISTENERS_H
+
+#include "iotapi.h"
+
+/** Total listeners with a direct connection to the command parser */
+#ifndef TOTAL_COMMAND_LISTENERS
+#define TOTAL_COMMAND_LISTENERS 10
+#endif
+
+/** Number of characters to match in the 'type' attribute of a command */
+#ifndef TYPE_ATTRIBUTE_CHARS_TO_MATCH
+#define TYPE_ATTRIBUTE_CHARS_TO_MATCH 3
+#endif
+
+/***************** Public Prototypes ****************/
+error_t iotcommandlisteners_broadcast(command_t *cmd);
+
+int iotcommandlisteners_totalListeners();
+
+#endif
+

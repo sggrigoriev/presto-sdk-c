@@ -1,4 +1,3 @@
-
 /*
  *  Copyright 2013 People Power Company
  *  
@@ -16,3 +15,29 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+
+#ifndef GADGETDISCOVERY_H
+#define GADGETDISCOVERY_H
+
+#define GADGET_LOCATION_HDR "Location:"
+
+#define GADGET_SSDP_ADDR "239.255.255.250"
+
+#define GADGET_SSDP_PORT 1900
+
+
+#define GADGET_JSON_ATTR_MODEL "model"
+
+#define GADGET_JSON_ATTR_UUID "uuid"
+
+#define GADGET_JSON_ATTR_API_VERSION "api_version"
+
+#define GADGET_JSON_ATTR_FW_VERSION "fw_version"
+
+#define GADGET_JSON_ATTR_WLAN_FW_VERSION "wlan_fw_version"
+
+/***************** Public Prototypes ****************/
+error_t gadgetdiscovery_runOnce();
+
+
+#endif

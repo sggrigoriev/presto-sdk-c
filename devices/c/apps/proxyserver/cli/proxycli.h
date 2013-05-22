@@ -1,4 +1,3 @@
-
 /*
  *  Copyright 2013 People Power Company
  *  
@@ -16,3 +15,28 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+
+#ifndef PROXYCLI_H
+#define PROXYCLI_H
+
+enum {
+  PROXYCLI_CONFIG_FILE_PATH_SIZE = 40,
+};
+
+/***************** Public Prototypes ****************/
+void proxycli_parse(int argc, char *argv[]);
+
+int proxycli_getPort();
+
+const char *proxycli_getActivationKey();
+
+const char *proxycli_getConfigFilename();
+
+const char *proxycli_getUsername();
+
+const char *proxycli_getPassword();
+
+const bool proxycli_readyToActivate();
+
+#endif
+

@@ -1,4 +1,3 @@
-
 /*
  *  Copyright 2013 People Power Company
  *  
@@ -16,3 +15,12 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+
+#ifndef H2SWRAPPER_H
+#define H2SWRAPPER_H
+
+/***************** Public Prototypes ****************/
+int h2swrapper_wrap(char *dest, char *message, int destSize);
+
+#endif
+

@@ -1,4 +1,3 @@
-
 /*
  *  Copyright 2013 People Power Company
  *  
@@ -16,3 +15,17 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+
+#ifndef IOTGEN_H
+#define IOTGEN_H
+
+enum {
+  IOTGEN_NUMERIC_STRING_SIZE = 32,
+  IOTGEN_DEVICE_ID_SIZE = 32,
+  IOTGEN_RESULT_XML_SIZE = 64,
+  IOTGEN_ADD_REMOVE_XML_SIZE = 512,
+};
+
+
+#endif
+

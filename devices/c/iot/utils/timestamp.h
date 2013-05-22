@@ -1,4 +1,3 @@
-
 /*
  *  Copyright 2013 People Power Company
  *  
@@ -16,3 +15,18 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+
+#ifndef TIMESTAMP_H
+#define TIMESTAMP_H
+
+enum {
+  TIMESTAMP_ZONE_SIZE = 8,
+  TIMESTAMP_STAMP_SIZE = 40,
+};
+
+/***************** Public Prototypes ****************/
+int getTimestamp(char *dest, int maxSize);
+
+void getTimezone(char *dest, int size);
+
+#endif
