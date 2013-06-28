@@ -1,0 +1,7 @@
+MODULES_MANAGER_V2
+peoplepower.device|C:\cygwin\home\Arun\workspace\presencesdk\analytics\toolkit\peoplepower\device.py
+peoplepower.location|C:\cygwin\home\Arun\workspace\presencesdk\analytics\toolkit\peoplepower\location.py
+peoplepower.parameter|C:\cygwin\home\Arun\workspace\presencesdk\analytics\toolkit\peoplepower\parameter.py
+peoplepower.sdk|C:\cygwin\home\Arun\workspace\presencesdk\analytics\toolkit\peoplepower\sdk.py
+peoplepower.test|C:\cygwin\home\Arun\workspace\presencesdk\analytics\toolkit\peoplepower\test.py
+peoplepower.user|C:\cygwin\home\Arun\workspace\presencesdk\analytics\toolkit\peoplepower\user.py

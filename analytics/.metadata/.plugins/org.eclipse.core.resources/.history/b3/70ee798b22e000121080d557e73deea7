@@ -1,0 +1,10 @@
+from user import User
+
+'''
+Created on Jun 27, 2013
+@author: Arun Varma
+'''
+
+if __name__ == '__main__':
+    user = User("id")
+    print(user.toJSON())

@@ -1,0 +1,74 @@
+import json
+
+'''
+Created on June 25, 2013
+@author: Arun Varma
+'''
+
+class Location(object):
+    '''
+    __init__
+    defines a Location object
+    @param name: String
+    @param stateId: int
+    @param countryId: int
+    @param city: String
+    @param timezone: String
+    @param zipcode: String
+    '''
+    def __init__(self, name, city = None, stateId = None, countryId = None, timezone = None, zipcode = None):
+        self._name = name
+        self._stateId = stateId
+        self._countryId = countryId
+        self._timezone = timezone
+        self._zipcode = zipcode
+        self._devices = []
+
+    '''
+    getName
+    returns the name of this Location
+    '''
+    def getName(self):
+        return self._name
+    
+        '''
+    getStateId
+    returns the state ID of this Location
+    '''
+    def getStateId(self):
+        return self._stateId
+    
+        '''
+    getName
+    returns the name of this Location
+    '''
+    def getName(self):
+        return self._name
+    
+        '''
+    getName
+    returns the name of this Location
+    '''
+    def getName(self):
+        return self._name
+
+    '''
+    getDevices
+    returns the list of Devices at this Location
+    '''
+    def getDevices(self):
+        return self._devices
+
+    '''
+    addDevice
+    adds the given device to this Location's list of devices
+    '''
+    def addDevice(self, device):
+        self._devices.add(device)
+
+    '''
+    toJSON
+    returns the JSON representation of this Location
+    '''
+    def toJSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)

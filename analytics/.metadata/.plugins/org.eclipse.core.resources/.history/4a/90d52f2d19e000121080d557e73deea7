@@ -1,0 +1,11 @@
+from location import Location
+import simplejson
+
+'''
+Created on Jun 27, 2013
+@author: Arun Varma
+'''
+
+if __name__ == '__main__':
+    loc = Location("name")
+    print(simplejson.dumps("3hello"))

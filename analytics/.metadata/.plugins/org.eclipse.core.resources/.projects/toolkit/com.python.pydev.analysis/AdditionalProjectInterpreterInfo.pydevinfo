@@ -1,0 +1,77 @@
+-- VERSION_3
+-- START DISKCACHE
+C:\cygwin\home\Arun\workspace\presencesdk\analytics\.metadata\.plugins\org.eclipse.core.resources\.projects\toolkit\com.python.pydev.analysis\v1_indexcache
+.v1_indexcache
+peoplepower.parameter|0|C:\cygwin\home\Arun\workspace\presencesdk\analytics\toolkit\peoplepower\parameter.py
+peoplepower.device|0|C:\cygwin\home\Arun\workspace\presencesdk\analytics\toolkit\peoplepower\device.py
+peoplepower.sdk|0|C:\cygwin\home\Arun\workspace\presencesdk\analytics\toolkit\peoplepower\sdk.py
+peoplepower.location|0|C:\cygwin\home\Arun\workspace\presencesdk\analytics\toolkit\peoplepower\location.py
+peoplepower.test|0|C:\cygwin\home\Arun\workspace\presencesdk\analytics\toolkit\peoplepower\test.py
+-- END DISKCACHE
+-- START DICTIONARY
+13
+4=peoplepower.parameter
+6=Device
+13=Sdk
+5=peoplepower.sdk
+2=peoplepower.device
+12=Location.__init__
+10=Parameter.__init__
+7=Location
+11=Parameter.setVal
+8=Parameter
+3=peoplepower.location
+1=peoplepower.test
+9=Device.__init__
+-- END DICTIONARY
+-- START TREE 1
+8
+dev|2|dev!11@Device!17@
+loc|2|loc!11@Location!25@
+log|0|
+par|1|Parameter!33@
+sdk|1|Sdk!41@
+toj|0|
+us|0|
+use|1|user1!11@
+-- END TREE
+-- START TREE 2
+37
+!<m|0|
+__i|3|__init__!6&18@__init__!7&26@__init__!8&34@
+_co|0|
+_de|1|_deviceId!9&19@
+_in|1|_index!10&35@
+_lo|1|_loc!9&19@
+_mu|1|_multiplier!10&35@
+_na|1|_name!10&35@
+_st|0|
+_ti|0|
+_us|1|_user!9&19@
+_va|2|_value!11&35@_value!10&35@
+_zi|0|
+add|1|addDevice!7&26@
+app|0|
+cou|1|countryId!12&27@
+cre|0|
+def|0|
+dev|1|devicesInfo!13&42@
+fir|0|
+get|17|getMult!8&34@getName!7&26@getZipcode!7&26@getDeviceId!6&18@getStateId!7&26@getDevices!7&26@getProductId!13&42@getTimezone!7&26@getName!8&34@getLocation!6&18@getCity!7&26@getParams!6&18@getCountryId!7&26@getUser!7&26@getVal!8&34@getIndex!8&34@getRootSite!13&42@
+las|0|
+log|0|
+nam|1|name!12&27@
+new|0|
+obj|0|
+pas|0|
+pop|1|populate!6&18@
+reg|2|register!6&18@registerNew!13&42@
+res|0|
+run|1|run!13&42@
+set|1|setVal!8&34@
+sta|1|stateId!12&27@
+tim|1|timezone!12&27@
+toj|1|toJSON!7&26@
+use|1|user!13&42@
+zip|1|zip!12&27@
+-- END TREE
