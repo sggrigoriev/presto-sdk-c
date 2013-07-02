@@ -1,11 +1,6 @@
-INSTUPpeoplepower.sdk
-C:\cygwin\home\Arun\workspace\presencesdk\analytics\toolkit\peoplepower\sdk.py
-INFOS:&&1|1|2|0&&2|3|2|1&&2|4|2|1&&2|5|2|1&&2|6|2|1&&2|7|2|1&&2|8|2|1
-getRootSite=3
-getProductId=7
-devicesInfo=6
-Sdk=1
-peoplepower.sdk=2
-run=8
-user=4
-registerNew=5
+INSTUPtest
+C:\cygwin\home\Arun\workspace\presencesdk\analytics\toolkit\peoplepower\test.py
+INFOS:&&3|1|2|0&&3|3|2|0
+test=2
+user1=3
+loc=1

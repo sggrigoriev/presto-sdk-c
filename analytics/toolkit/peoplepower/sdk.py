@@ -1,3 +1,5 @@
+import json
+
 '''
 Created on June 25, 2013
 @author: Arun Varma
@@ -5,12 +7,12 @@ Created on June 25, 2013
 
 class Sdk:
     '''
-    getRootSite
-    returns the People Power root site
+    rootSite
+    @return the People Power root site
     '''
     @staticmethod
-    def getRootSite():
-        return "https://developer.peoplepowerco.com"
+    def rootSite():
+        return "alpha2.peoplepowerco.com"
 
     '''
     user
@@ -47,6 +49,14 @@ class Sdk:
     @staticmethod
     def getProductId(deviceId):
         return
+
+    '''
+    toJson
+    returns a JSON representation of the given object
+    '''
+    @staticmethod
+    def toJson(this):
+        return json.dumps(this, default=lambda obj: obj.__dict__, indent=2)
 
     '''
     run

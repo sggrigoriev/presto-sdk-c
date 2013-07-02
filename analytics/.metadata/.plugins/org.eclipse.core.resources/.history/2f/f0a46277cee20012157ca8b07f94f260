@@ -1,0 +1,102 @@
+'''
+Created on June 25, 2013
+@author: Arun Varma
+'''
+
+class Location(object):
+    '''
+    __init__
+    defines a Location object
+    @param name: String
+    @param state: State
+    @param country: Country
+    @param city: String
+    @param timezone: Timezone
+    @param zipcode: String
+    '''
+    def __init__(self, name, timezone = None, address1 = None, address2 = None, city = None, state = None, country = None, zipcode = None):
+        self.name = name
+        self.timezone = timezone
+        self.addrstreet1 = address1
+        self.addrstreet2 = address2
+        self.addrcity = city
+        self.state = state
+        self.country = country
+        self.zip = zipcode
+
+    '''
+    refreshFromServer
+    ????????????????????????????//
+    '''
+    def refreshFromServer(self):
+        
+    '''
+    getName
+    returns the name of this Location
+    '''
+    def getName(self):
+        return self.name
+
+    '''
+    getTimezone
+    returns the timezone of this Location
+    '''
+    def getTimezone(self):
+        return self._timezone
+
+    '''
+    getAddress1
+    returns the first address of this Location
+    '''
+    def getAddress1(self):
+        return self.addrstreet1
+
+    '''
+    getAddress2
+    returns the second address of this Location
+    '''
+    def getAddress2(self):
+        return self.addrstreet2
+
+    '''
+    getCity
+    returns the city of this Location
+    '''
+    def getCity(self):
+        return self.addrcity
+
+    '''
+    getState
+    returns the state of this Location
+    '''
+    def getState(self):
+        return self.state
+
+    '''
+    getCountry
+    returns the country of this Location
+    '''
+    def getCountry(self):
+        return self.country
+
+    '''
+    getZipcode
+    returns the zipcode of this Location
+    '''
+    def getZipcode(self):
+        return self.zip
+
+    '''
+    getDevices
+    returns the list of Devices at this Location
+    '''
+    def getDevices(self):
+        return self.devices
+
+    '''
+    addDevice
+    adds the given device to this Location's list of devices
+    @param device: Device
+    '''
+    def addDevice(self, device):
+        self.devices.add(device)

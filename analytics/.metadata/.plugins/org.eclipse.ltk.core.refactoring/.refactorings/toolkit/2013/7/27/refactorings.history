@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">&#x0A;<refactoring comment="Rename resource &apos;toolkit/peoplepower/parameter.py&apos; to &apos;param.py&apos;" description="Rename resource &apos;parameter.py&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="peoplepower/parameter.py" name="param.py" stamp="1372699852946" updateReferences="true"/>&#x0A;<refactoring comment="Rename resource &apos;toolkit/peoplepower/stat.py&apos; to &apos;state.py&apos;" description="Rename resource &apos;stat.py&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="peoplepower/stat.py" name="state.py" stamp="1372701245762" updateReferences="true"/>
+</session>
