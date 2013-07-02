@@ -34,3 +34,7 @@ unittest*
 *.exe
 *.out
 *.app
+
+# Python
+.pydevproject
+
