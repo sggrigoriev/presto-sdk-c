@@ -1,19 +1,14 @@
-from sdk import Sdk
-from location import Location
-from user import User
-from device import Device
-
 '''
 Created on June 27, 2013
 @author: Arun Varma
 '''
+import user
+from location import Location
+from device import Device
 
 if __name__ == '__main__':
-    loc = Location("id")
-    '''print(loc.toJSON())'''
-    User.login("asdf", "sadf")
-    '''print(user1.toJSON())
-    dev = Device(user1, "adf", loc)
-    print(Sdk.toJson(dev))
-    user1.createAccount("asdfsad", "asdfasd", "asdfds", loc, "Arun", "Varma")
-    user1.login("asdfsad", "asdfasd")'''
+    loc = Location("Home")
+    user.createAccount("arun_varma+19@peoplepowerco.com", "password", "FirstApp", "arun_varma+19@peoplepowerco.com", loc)
+    '''
+    user.login("arun_varma+13@peoplepowerco.com", "password")
+    '''

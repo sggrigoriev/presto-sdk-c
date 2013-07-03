@@ -3,6 +3,7 @@ Created on June 25, 2013
 @author: Arun Varma
 '''
 
+
 class Location(object):
     '''
     __init__
@@ -23,6 +24,7 @@ class Location(object):
         self.state = state
         self.country = country
         self.zip = zipcode
+
 
     '''
     refreshFromServer
