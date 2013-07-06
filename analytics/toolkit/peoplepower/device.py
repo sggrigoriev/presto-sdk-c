@@ -19,10 +19,10 @@ def register(deviceId, productId, user):
     jsonUser = user.getInfo()
     # decode response from unicode to String, deserialize JSON code into a Python dictionary
     responseObj = json.loads(jsonUser.decode('utf-8'))
-    endpoint = "/cloud/xml/deviceRegistration/" + responseObj[""] + "/" + deviceId
+    endpoint = "/cloud/json/deviceRegistration/" + responseObj[""] + "/" + deviceId
     body = {"productId" : sdk.getProductId(productId)}
     header = {"PRESENCE_API_KEY" : user.getApiKey()}
-    # sends product ID and API Key to endpoint site as http "POST" command, receives response
+    # send product ID and API Key to endpoint site as http "POST" command, receive response
     sdk.sendAndReceive("POST", endpoint, body, header)
 
 
@@ -36,7 +36,7 @@ class Device(object):
     @param loc: Location
     '''
     def __init__(self, deviceId, user, desc, loc):
-        # verifies that device ID only contains valid characters
+        # verify that device ID only contains valid characters
         for char in deviceId:
             if char == " ":
                 raise Exception("Device ID can only take valid characters")

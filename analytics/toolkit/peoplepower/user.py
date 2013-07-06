@@ -24,12 +24,16 @@ def createAccount(username, password, appName, email, loc, firstName = None, las
     endpoint = "/cloud/json/newUser"
     # body is JSON representation of user, followed by JSON-representation of user's location
     body = '{"user": ' + sdk.toJson(userVitals) + ', "location":' + sdk.toJson(loc) + "}"
-    # specifies JSON as encoding language
+    # specify JSON as encoding language
     header = {"Content-Type" : "application/json"}
-    # sends body and header to endpoint site as http "POST" command, receives response
+    # send body and header to endpoint site as http "POST" command, receives response
     response = sdk.sendAndReceive("POST", endpoint, body, header)
-    # verifies that Create Account was successful, reacts accordingly
-    verifyResponse(response, "New user created in server with API Key: ")
+    # verify that Create Account was successful
+    responseObj = json.loads(response.decode("utf-8"))
+    sdk.verifyResponse(responseObj)
+    print("New account was created as " + username)
+    # extract key from response object and create new user object
+    return CachedUser(responseObj["key"])
 
 
 '''
@@ -41,31 +45,15 @@ login
 def login(username, password):
     endpoint = "/cloud/json/login"
     body = urllib.urlencode({"username" : username})
-    header = urllib.urlencode({"PASSWORD" : password})
-    # sends username and password to endpoint site as http "POST" command, receives response
-    response = sdk.sendAndReceive("POST", endpoint, body, header)
-    # verifies that Login was successful, reacts accordingly
-    verifyResponse(response, "Logged in with the API Key: ")
-
-
-'''
-verifyResponse
-verifies that action was successful, reacts accordingly
-@param response: String
-@param message: String
-'''
-def verifyResponse(response, message):
-    # decode response from unicode to String, deserialize JSON code into a Python dictionary
+    header = {"PASSWORD" : password}
+    # send username and password to endpoint site as http "POST" command, receives response
+    response = sdk.sendAndReceive("GET", endpoint, body, header)
+    # verify that Login was successful
     responseObj = json.loads(response.decode("utf-8"))
-    # get result code from dictionary
-    resultCode = responseObj["resultCode"]
-    # if action was successful, get API Key
-    if resultCode == sdk.SUCCESS:
-        apiKey = responseObj["key"]
-        print(message + apiKey)
-    # else, throw an error corresponding to result code
-    else:
-        sdk.errorCode(resultCode)
+    sdk.verifyResponse(responseObj)
+    print("User logged in as " + username)
+    # extract key from response object and create new user object
+    return CachedUser(responseObj["key"])
 
 
 class UserVitals(object):
@@ -95,26 +83,30 @@ class CachedUser(object):
     @param apiKey: String
     '''
     def __init__(self, apiKey):
-        '''
-        self.username = username
-        self.password = password
-        self.appname = appName
-        self.location = loc
-        self.firstname = firstName
-        self.lastname = lastName
-        '''
+        self.apiKey = apiKey
 
+        # extract username and id from server
+        userInfo = self.getUserInfo()
+        self.username = userInfo["userName"]
+        self.id = userInfo["id"]
+
+        # extract user's locations from server
+        locationsInfo = self.getLocationsInfo()
 
     '''
-    getInfo
+    getAllInfo
     returns a JSON object containing all known details about CachedUser and associated Locations
     '''
-    def getInfo(self):
+    def getAllInfo(self):
         endpoint = "/cloud/json/user"
         body = {}
         header = {"PRESENCE_API_KEY" : self.apiKey}
         # sends API Key to endpoint site as http "GET" command, receives response
-        sdk.sendAndReceive("GET", endpoint, body, header)
+        response = sdk.sendAndReceive("GET", endpoint, body, header)
+        responseObj = json.loads(response.decode("utf-8"))
+        # verify that GET command was successful
+        sdk.verifyResponse(responseObj)
+        return responseObj
 
     '''
     refreshFromServer
@@ -122,9 +114,54 @@ class CachedUser(object):
     '''
     def refreshUser(self):
         endpoint = "/cloud/json/user"
-        body = urllib.urlencode({"username" : self.username})
+        body = {}
         header = {"PRESENCE_API_KEY" : self.apiKey}
         sdk.sendAndReceive("GET", endpoint, body, header)
+        print(self.username + " refreshed")
+
+    '''
+    logout
+    logs the user out by destroying their API Key
+    '''
+    def logout(self):
+        endpoint = "/cloud/json/logout"
+        body = urllib.urlencode({"username" : self.username})
+        header = {"PRESENCE_API_KEY" : self.apiKey}
+        response = sdk.sendAndReceive("GET", endpoint, body, header)
+        responseObj = json.loads(response.decode("utf-8"))
+        # verify that GET command was successful
+        sdk.verifyResponse(responseObj)
+        print(self.username + " logged out")
+
+    '''
+    getUserInfo
+    returns a JSON object containing all known details about CachedUser
+    '''
+    def getUserInfo(self):
+        # extract only user section of getAllInfo
+        return self.getAllInfo()["user"]
+
+    '''
+    getLocationsInfo
+    returns a JSON object containing all known details about associated locations
+    '''
+    def getLocationsInfo(self):
+        # extract only locations section of getAllInfo
+        return self.getAllInfo()["locations"]
+
+    '''
+    getId
+    @return the ID number of this CachedUser
+    '''
+    def getId(self):
+        return self.id
+
+    '''
+    getApiKey
+    @return the API Key of this CachedUser
+    '''
+    def getApiKey(self):
+        return self.apiKey
 
     '''
     addLocation
@@ -140,17 +177,3 @@ class CachedUser(object):
     '''
     def getLocs(self):
         return self.locations
-
-    '''
-    getId
-    @return the ID number of this CachedUser
-    '''
-    def getId(self):
-        return self.id
-
-    '''
-    getApiKey
-    @return the API Key of this CachedUser
-    '''
-    def getApiKey(self):
-        return self.apiKey
