@@ -3,6 +3,7 @@ Created on June 25, 2013
 @author: Arun Varma
 '''
 import sdk
+import location
 import json
 import urllib.parse as urllib
 
@@ -84,29 +85,22 @@ class CachedUser(object):
     '''
     def __init__(self, apiKey):
         self.apiKey = apiKey
+        info = self.getInfo()
 
         # extract username and id from server
-        userInfo = self.getUserInfo()
+        userInfo = info["user"]
         self.username = userInfo["userName"]
         self.id = userInfo["id"]
 
         # extract user's locations from server
-        locationsInfo = self.getLocationsInfo()
-
-    '''
-    getAllInfo
-    returns a JSON object containing all known details about CachedUser and associated Locations
-    '''
-    def getAllInfo(self):
-        endpoint = "/cloud/json/user"
-        body = {}
-        header = {"PRESENCE_API_KEY" : self.apiKey}
-        # sends API Key to endpoint site as http "GET" command, receives response
-        response = sdk.sendAndReceive("GET", endpoint, body, header)
-        responseObj = json.loads(response.decode("utf-8"))
-        # verify that GET command was successful
-        sdk.verifyResponse(responseObj)
-        return responseObj
+        locInfo = info["locations"]
+        self.locs = []
+        # while list of location dictionaries contains elements
+        while locInfo:
+            # pop location dictionary from locations dictionary, convert to location object
+            curLoc = location.toLoc(self, locInfo.pop())
+            # add location object to user's list of locations
+            self.locs.append(curLoc)
 
     '''
     refreshFromServer
@@ -132,22 +126,22 @@ class CachedUser(object):
         # verify that GET command was successful
         sdk.verifyResponse(responseObj)
         print(self.username + " logged out")
+        del self
 
     '''
-    getUserInfo
-    returns a JSON object containing all known details about CachedUser
+    getAllInfo
+    returns a JSON object containing all known details about CachedUser and associated Locations
     '''
-    def getUserInfo(self):
-        # extract only user section of getAllInfo
-        return self.getAllInfo()["user"]
-
-    '''
-    getLocationsInfo
-    returns a JSON object containing all known details about associated locations
-    '''
-    def getLocationsInfo(self):
-        # extract only locations section of getAllInfo
-        return self.getAllInfo()["locations"]
+    def getInfo(self):
+        endpoint = "/cloud/json/user"
+        body = {}
+        header = {"PRESENCE_API_KEY" : self.apiKey}
+        # sends API Key to endpoint site as http "GET" command, receives response
+        response = sdk.sendAndReceive("GET", endpoint, body, header)
+        responseObj = json.loads(response.decode("utf-8"))
+        # verify that GET command was successful
+        sdk.verifyResponse(responseObj)
+        return responseObj
 
     '''
     getId
@@ -164,16 +158,21 @@ class CachedUser(object):
         return self.apiKey
 
     '''
-    addLocation
-    adds a location to this CachedUser's list of locations
-    @param loc: Location
-    '''
-    def addLoc(self, loc):
-        self.locations.add(loc)
-
-    '''
     getLocations
     @return this CachedUser's list of locations
     '''
     def getLocs(self):
-        return self.locations
+        return self.locs
+
+    '''
+    addLocation
+    adds a location to this CachedUser's list of locations
+    @param loc: LocationVitals
+    '''
+    def addLoc(self, loc):
+        endpoint = "/cloud/json/location"
+        body = "{location:" + sdk.toJson(loc) + "}"
+        header = {"Content-Type" : "application/json", "PRESENCE_API_KEY" : self.apiKey}
+        response = sdk.sendAndReceive("POST", endpoint, body, header)
+        # verify that GET command was successful
+        sdk.verifyResponse(json.loads(response.decode("utf-8")))

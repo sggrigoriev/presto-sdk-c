@@ -4,10 +4,31 @@ Created on June 25, 2013
 '''
 
 
-class Location(object):
+def isThere(item, locDict):
+    if locDict.__contains__(item):
+        return locDict[item]
+    else:
+        return None
+
+
+def toLoc(user, locDict):
+    name = locDict["name"]
+    idNo = locDict["id"]
+    away = isThere("away", locDict)
+    address1 = isThere("addrstreet1", locDict)
+    address2 = isThere("addrstreet2", locDict)
+    city = isThere("city", locDict)
+    state = isThere("state", locDict)
+    country = isThere("country", locDict)
+    zipcode = isThere("zip", locDict)
+    timezone = isThere("timezone", locDict)
+    return Location(user, name, idNo, away, address1, address2, city, state, country, zipcode, timezone)
+
+
+class LocationVitals(object):
     '''
     __init__
-    defines a Location object
+    defines a Location object with only attributes necessary to be serialized as a JSON object
     @param name: String
     @param state: State
     @param country: Country
@@ -15,7 +36,37 @@ class Location(object):
     @param timezone: Timezone
     @param zipcode: String
     '''
-    def __init__(self, name, timezone = None, address1 = None, address2 = None, city = None, state = None, country = None, zipcode = None):
+    def __init__(self, name, address1 = None, address2 = None, city = None, state = None, country = None, zipcode = None, timezone = None):
+        self.name = name
+        self.addrstreet1 = address1
+        self.addrstreet2 = address2
+        self.addrcity = city
+        self.state = state
+        self.country = country
+        self.zip = zipcode
+        self.timezone = timezone
+
+
+class Location(object):
+    '''
+    __init__
+    defines a Location object
+    @param user: User
+    @param name: String
+    @param away: boolean
+    @param idNo: int
+    @param address1: String
+    @param address2: String
+    @param city: String
+    @param state: State
+    @param country: Country
+    @param zipcode: String
+    @param timezone: Timezone
+    '''
+    def __init__(self, user, name, away, idNo, address1 = None, address2 = None, city = None, state = None, country = None, zipcode = None, timezone = None):
+        self.user = user
+        self.id = idNo
+        self.away = away
         self.name = name
         self.timezone = timezone
         self.addrstreet1 = address1
@@ -54,59 +105,3 @@ class Location(object):
     '''
     def getUser(self):
         return
-
-    '''
-    getName
-    @return the name of this Location
-    '''
-    def getName(self):
-        return self.name
-
-    '''
-    getTimezone
-    @return the timezone of this Location
-    '''
-    def getTimezone(self):
-        return self._timezone
-
-    '''
-    getAddress1
-    @return the first address of this Location
-    '''
-    def getAddress1(self):
-        return self.addrstreet1
-
-    '''
-    getAddress2
-    @return the second address of this Location
-    '''
-    def getAddress2(self):
-        return self.addrstreet2
-
-    '''
-    getCity
-    @return the city of this Location
-    '''
-    def getCity(self):
-        return self.addrcity
-
-    '''
-    getState
-    @return the state of this Location
-    '''
-    def getState(self):
-        return self.state
-
-    '''
-    getCountry
-    @return the country of this Location
-    '''
-    def getCountry(self):
-        return self.country
-
-    '''
-    getZipcode
-    @return the zipcode of this Location
-    '''
-    def getZipcode(self):
-        return self.zip
