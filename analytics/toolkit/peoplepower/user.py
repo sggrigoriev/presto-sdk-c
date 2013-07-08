@@ -45,13 +45,16 @@ login
 '''
 def login(username, password, expiry = None):
     endpoint = "/cloud/json/login"
-    bodyDict = {"username" : username}
+    endpoint += "username=" + username
+    
     if expiry != None:
-        bodyDict["expiry"] = expiry
-    body = urllib.urlencode(bodyDict)
+        endpoint += "&expiry=" + expiry
+    
+    endpoint = urllib.urlencode(endpoint)
+    
     header = {"PASSWORD" : password}
     # send username and password to endpoint site as http "POST" command, receives response
-    response = toolkit.sendAndReceive("GET", endpoint, body, header)
+    response = toolkit.sendAndReceive("GET", endpoint, None, header)
     # verify that Login was successful
     responseObj = json.loads(response.decode("utf-8"))
     toolkit.verifyResponse(responseObj)
