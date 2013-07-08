@@ -10,7 +10,7 @@ class Timezone:
     @param offset: int
     @param dst: boolean (daylight savings time)
     '''
-    def __init__(self, idNo, offset = "null", dst = "null"):
+    def __init__(self, idNo, offset = None, dst = None):
         self.id = idNo
         self.offset = offset
         self.dst = dst

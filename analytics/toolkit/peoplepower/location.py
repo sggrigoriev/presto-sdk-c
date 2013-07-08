@@ -22,7 +22,7 @@ def toLoc(user, locDict):
     country = isThere("country", locDict)
     zipcode = isThere("zip", locDict)
     timezone = isThere("timezone", locDict)
-    return Location(user, name, idNo, away, address1, address2, city, state, country, zipcode, timezone)
+    return Location(user, name, away, idNo, address1, address2, city, state, country, zipcode, timezone)
 
 
 class LocationVitals(object):
@@ -79,7 +79,7 @@ class Location(object):
 
     '''
     refreshFromServer
-    ????????????????????????????//
+    refreshes the Location from the server
     '''
     def refreshFromServer(self):
         return
@@ -105,3 +105,10 @@ class Location(object):
     '''
     def getUser(self):
         return
+
+    '''
+    getId
+    @return the id of this location
+    '''
+    def getId(self):
+        return self.id

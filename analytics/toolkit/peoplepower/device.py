@@ -2,7 +2,8 @@
 Created on June 25, 2013
 @author: Arun Varma
 '''
-import sdk
+import toolkit
+import urllib.parse as urllib
 
 
 '''
@@ -13,14 +14,16 @@ registers this device with the cloud
 @param productId: int
 @param desc: String (user description of the device)
 '''
-def register(loc, apiKey, deviceId, productId, desc):
-    locId = loc.
-    endpoint = "/cloud/json/deviceRegistration/" + locId + "/" + deviceId
-    body = {"productId" : productId}
+def register(aUser, deviceId, productId, desc):
+    apiKey = aUser.getApiKey()
+    loc = aUser.getLocs().pop()
+    endpoint = "/cloud/json/deviceRegistration/" + (loc.getId()).__str__() + "/" + deviceId
+    body = urllib.urlencode({"productId" : productId})
     header = {"PRESENCE_API_KEY" : apiKey}
     # send product ID and API Key to endpoint site as http "POST" command, receive response
-    sdk.sendAndReceive("POST", endpoint, body, header)
-    return Device(apiKey, deviceId, desc, locId)
+    toolkit.sendAndReceive("POST", endpoint, body, header)
+    print("Device registered with ID " + deviceId)
+    return Device(aUser, deviceId, loc, desc)
 
 
 '''
@@ -33,7 +36,7 @@ def getParams(self, deviceId = None, params = None, index = None):
     endpoint = "/cloud/json/parameters"
     body = {}
     header = {"PRESENCE_API_KEY" : self.apiKey}
-    sdk.sendAndReceive("GET", endpoint, body, header)
+    toolkit.sendAndReceive("GET", endpoint, body, header)
     print(self.username + " refreshed")
 
 
@@ -47,10 +50,6 @@ class Device(object):
     @param loc: Location
     '''
     def __init__(self, aUser, deviceId, loc, desc):
-        # verify that device ID only contains valid characters
-        for char in deviceId:
-            if char == " ":
-                raise Exception("Device ID can only take valid characters")
         self.user = aUser
         self.id = deviceId
         self.loc = loc
@@ -72,6 +71,13 @@ class Device(object):
     def populate(self, params = None):
         if params == None:
             params = self.getParams()
+
+    '''
+    getUser
+    returns the user of this device
+    '''
+    def getUser(self):
+        return self.user
 
     '''
     getDeviceId
