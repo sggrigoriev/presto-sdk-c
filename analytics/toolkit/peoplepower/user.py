@@ -1,8 +1,10 @@
 '''
+user
 Created on June 25, 2013
 @author: Arun Varma
 '''
-import sdk
+import utilities, strings
+import loc
 import json
 import urllib.parse as urllib
 
@@ -21,51 +23,53 @@ creates an account for a new User
 def createAccount(username, password, appName, email, loc, firstName = None, lastName = None):
     # put information into a JSON-convertible object
     userVitals = UserVitals(username, password, appName, email, firstName, lastName)
-    endpoint = "/cloud/json/newUser"
+    endpoint = strings.USER
     # body is JSON representation of user, followed by JSON-representation of user's location
-    body = '{"user": ' + sdk.toJson(userVitals) + ', "location":' + sdk.toJson(loc) + "}"
+    body = '{"user": ' + utilities.toJson(userVitals) + ', "location": ' + utilities.toJson(loc) + '}'
     # specifies JSON as encoding language
-    header = {"Content-Type" : "application/json"}
+    header = {strings.CONTENT_TYPE : strings.JSON_APPLICATION}
     # sends body and header to endpoint site as http "POST" command, receives response
-    response = sdk.sendAndReceive("POST", endpoint, body, header)
+    response = utilities.sendAndReceive(strings.POST, endpoint, body, header)
+    responseObj = json.loads(response.decode(strings.DECODER))
     # verifies that Create Account was successful, reacts accordingly
-    verifyResponse(response, "New user created in server with API Key: ")
+    utilities.verifyResponse(responseObj)
+    print('User "' + username + '" created')
+    return User(responseObj["key"])
 
 
 '''
 login
 @return the User's API Key
-@param username: String (email address)
+@param username: String
 @param password: String
+@param expiry: int (-1 if user does not wish for key to expire)
 '''
-def login(username, password):
-    endpoint = "/cloud/json/login"
-    body = urllib.urlencode({"username" : username})
-    header = urllib.urlencode({"PASSWORD" : password})
+def login(username, password, expiry = None):
+    endpoint = strings.USER_LOGIN + username
+    if expiry != None:
+        endpoint += strings.EXPIRY + expiry
+    header = {strings.PASSWORD : password}
     # sends username and password to endpoint site as http "POST" command, receives response
-    response = sdk.sendAndReceive("POST", endpoint, body, header)
+    response = utilities.sendAndReceive(strings.GET, endpoint, None, header)
+    responseObj = json.loads(response.decode(strings.DECODER))
     # verifies that Login was successful, reacts accordingly
-    verifyResponse(response, "Logged in with the API Key: ")
+    utilities.verifyResponse(responseObj)
+    print("Logged onto account " + username)
+    return User(responseObj["key"])
 
 
 '''
-verifyResponse
-verifies that action was successful, reacts accordingly
-@param response: String
-@param message: String
+logout
+@param user: User
+logs user out of server by destroying API Key
 '''
-def verifyResponse(response, message):
-    # decode response from unicode to String, deserialize JSON code into a Python dictionary
-    responseObj = json.loads(response.decode("utf-8"))
-    # get result code from dictionary
-    resultCode = responseObj["resultCode"]
-    # if action was successful, get API Key
-    if resultCode == sdk.SUCCESS:
-        apiKey = responseObj["key"]
-        print(message + apiKey)
-    # else, throw an error corresponding to result code
-    else:
-        sdk.errorCode(resultCode)
+def logout(user):
+    endpoint = strings.USER_LOGOUT
+    header = {strings.API_KEY : user.getKey()}
+    response = utilities.sendAndReceive(strings.GET, endpoint, None, header)
+    # verifies that Login was successful, reacts accordingly
+    utilities.verifyResponse(json.loads(response.decode(strings.DECODER)))
+    print('User "' + user.getUsername() + '" logged out')
 
 
 class UserVitals(object):
@@ -88,69 +92,62 @@ class UserVitals(object):
         self.lastname = lastName
 
 
-class CachedUser(object):
+class User(object):
     '''
     __init__
     defines a CachedUser object with a unique userId and list of locations where they have put devices
     @param apiKey: String
     '''
     def __init__(self, apiKey):
-        '''
-        self.username = username
-        self.password = password
-        self.appname = appName
-        self.location = loc
-        self.firstname = firstName
-        self.lastname = lastName
-        '''
-
+        self.apiKey = apiKey
+        responseObj = self.getInfo()
+        userInfo = responseObj["user"]
+        self.username = userInfo["userName"]
+        locDict = responseObj["locations"].pop()
+        self.loc = loc.toLoc(self, locDict)
 
     '''
     getInfo
-    returns a JSON object containing all known details about CachedUser and associated Locations
+    returns a JSON object containing all known details about User and associated Locations
     '''
     def getInfo(self):
-        endpoint = "/cloud/json/user"
-        body = {}
-        header = {"PRESENCE_API_KEY" : self.apiKey}
+        endpoint = strings.USER
+        body = None
+        header = {strings.API_KEY : self.apiKey}
         # sends API Key to endpoint site as http "GET" command, receives response
-        sdk.sendAndReceive("GET", endpoint, body, header)
+        response = utilities.sendAndReceive(strings.GET, endpoint, body, header)
+        responseObj = json.loads(response.decode(strings.DECODER))
+        # verifies that Login was successful, reacts accordingly
+        utilities.verifyResponse(responseObj)
+        return responseObj
 
     '''
     refreshFromServer
-    refreshes CachedUser's information
+    refreshes User's information
     '''
     def refreshUser(self):
-        endpoint = "/cloud/json/user"
-        body = urllib.urlencode({"username" : self.username})
-        header = {"PRESENCE_API_KEY" : self.apiKey}
-        sdk.sendAndReceive("GET", endpoint, body, header)
+        endpoint = strings.USER
+        body = urllib.urlencode({strings.USERNAME : self.username})
+        header = {strings.API_KEY : self.apiKey}
+        utilities.sendAndReceive(strings.GET, endpoint, body, header)
 
     '''
-    addLocation
-    adds a location to this CachedUser's list of locations
-    @param loc: Location
+    getUsername
+    @return this User's location
     '''
-    def addLoc(self, loc):
-        self.locations.add(loc)
+    def getUsername(self):
+        return self.username
 
     '''
-    getLocations
-    @return this CachedUser's list of locations
+    getLoc
+    @return this User's location
     '''
-    def getLocs(self):
-        return self.locations
+    def getLoc(self):
+        return self.loc
 
     '''
-    getId
-    @return the ID number of this CachedUser
+    getKey
+    @return the API Key of this User
     '''
-    def getId(self):
-        return self.id
-
-    '''
-    getApiKey
-    @return the API Key of this CachedUser
-    '''
-    def getApiKey(self):
+    def getKey(self):
         return self.apiKey
