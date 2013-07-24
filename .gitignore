@@ -37,4 +37,5 @@ unittest*
 
 # Python
 .pydevproject
+.metadata
 
