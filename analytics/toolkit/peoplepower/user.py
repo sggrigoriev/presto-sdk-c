@@ -1,10 +1,12 @@
 '''
+user
 Created on June 25, 2013
 @author: Arun Varma
 '''
-import toolkit
-import location
-import json, urllib.parse as urllib
+import utilities, strings
+import loc
+import json
+import urllib.parse as urllib
 
 
 '''
@@ -21,46 +23,53 @@ creates an account for a new User
 def createAccount(username, password, appName, email, loc, firstName = None, lastName = None):
     # put information into a JSON-convertible object
     userVitals = UserVitals(username, password, appName, email, firstName, lastName)
-    endpoint = "/cloud/json/newUser"
+    endpoint = strings.USER
     # body is JSON representation of user, followed by JSON-representation of user's location
-    body = '{"user": ' + toolkit.toJson(userVitals) + ', "location":' + toolkit.toJson(loc) + "}"
-    # specify JSON as encoding language
-    header = {"Content-Type" : "application/json"}
-    # send body and header to endpoint site as http "POST" command, receives response
-    response = toolkit.sendAndReceive("POST", endpoint, body, header)
-    # verify that Create Account was successful
-    responseObj = json.loads(response.decode("utf-8"))
-    toolkit.verifyResponse(responseObj)
-    print("New account was created as " + username)
-    # extract key from response object and create new user object
+    body = '{"user": ' + utilities.toJson(userVitals) + ', "location": ' + utilities.toJson(loc) + '}'
+    # specifies JSON as encoding language
+    header = {strings.CONTENT_TYPE : strings.JSON_APPLICATION}
+    # sends body and header to endpoint site as http "POST" command, receives response
+    response = utilities.sendAndReceive(strings.POST, endpoint, body, header)
+    responseObj = json.loads(response.decode(strings.DECODER))
+    # verifies that Create Account was successful, reacts accordingly
+    utilities.verifyResponse(responseObj)
+    print('User "' + username + '" created')
     return User(responseObj["key"])
 
 
 '''
 login
 @return the User's API Key
-@param username: String (email address)
+@param username: String
 @param password: String
-@param expiry: int (optional)
+@param expiry: int (-1 if user does not wish for key to expire)
 '''
 def login(username, password, expiry = None):
-    endpoint = "/cloud/json/login"
-    endpoint += "username=" + username
-    
+    endpoint = strings.USER_LOGIN + username
     if expiry != None:
-        endpoint += "&expiry=" + expiry
-    
-    endpoint = urllib.urlencode(endpoint)
-    
-    header = {"PASSWORD" : password}
-    # send username and password to endpoint site as http "POST" command, receives response
-    response = toolkit.sendAndReceive("GET", endpoint, None, header)
-    # verify that Login was successful
-    responseObj = json.loads(response.decode("utf-8"))
-    toolkit.verifyResponse(responseObj)
-    print("User logged in as " + username)
-    # extract key from response object and create new user object
+        endpoint += strings.EXPIRY + expiry
+    header = {strings.PASSWORD : password}
+    # sends username and password to endpoint site as http "POST" command, receives response
+    response = utilities.sendAndReceive(strings.GET, endpoint, None, header)
+    responseObj = json.loads(response.decode(strings.DECODER))
+    # verifies that Login was successful, reacts accordingly
+    utilities.verifyResponse(responseObj)
+    print("Logged onto account " + username)
     return User(responseObj["key"])
+
+
+'''
+logout
+@param user: User
+logs user out of server by destroying API Key
+'''
+def logout(user):
+    endpoint = strings.USER_LOGOUT
+    header = {strings.API_KEY : user.getKey()}
+    response = utilities.sendAndReceive(strings.GET, endpoint, None, header)
+    # verifies that Login was successful, reacts accordingly
+    utilities.verifyResponse(json.loads(response.decode(strings.DECODER)))
+    print('User "' + user.getUsername() + '" logged out')
 
 
 class UserVitals(object):
@@ -91,95 +100,54 @@ class User(object):
     '''
     def __init__(self, apiKey):
         self.apiKey = apiKey
-        info = self.getInfo()
-
-        # extract username and id from server
-        userInfo = info["user"]
+        responseObj = self.getInfo()
+        userInfo = responseObj["user"]
         self.username = userInfo["userName"]
-        self.id = userInfo["id"]
-
-        # extract user's locations from server
-        locInfo = info["locations"]
-        locsList = []
-        # while list of location dictionaries contains elements
-        while locInfo:
-            # pop location dictionary from locations dictionary, convert to location object
-            curLoc = location.toLoc(self, locInfo.pop())
-            # add location object to user's list of locations
-            locsList.append(curLoc)
-        self.locs = locsList
+        locDict = responseObj["locations"].pop()
+        self.loc = loc.toLoc(self, locDict)
 
     '''
-    refreshFromServer
-    refreshes CachedUser's information
-    '''
-    def refreshUser(self):
-        endpoint = "/cloud/json/user"
-        body = {}
-        header = {"PRESENCE_API_KEY" : self.apiKey}
-        toolkit.sendAndReceive("GET", endpoint, body, header)
-        print(self.username + " refreshed")
-
-    '''
-    logout
-    logs the user out by destroying their API Key
-    '''
-    def logout(self):
-        endpoint = "/cloud/json/logout"
-        body = urllib.urlencode({"username" : self.username})
-        header = {"PRESENCE_API_KEY" : self.apiKey}
-        response = toolkit.sendAndReceive("GET", endpoint, body, header)
-        responseObj = json.loads(response.decode("utf-8"))
-        # verify that GET command was successful
-        toolkit.verifyResponse(responseObj)
-        print(self.username + " logged out")
-        del self
-
-    '''
-    getAllInfo
-    returns a JSON object containing all known details about CachedUser and associated Locations
+    getInfo
+    returns a JSON object containing all known details about User and associated Locations
     '''
     def getInfo(self):
-        endpoint = "/cloud/json/user"
-        body = {}
-        header = {"PRESENCE_API_KEY" : self.apiKey}
+        endpoint = strings.USER
+        body = None
+        header = {strings.API_KEY : self.apiKey}
         # sends API Key to endpoint site as http "GET" command, receives response
-        response = toolkit.sendAndReceive("GET", endpoint, body, header)
-        responseObj = json.loads(response.decode("utf-8"))
-        # verify that GET command was successful
-        toolkit.verifyResponse(responseObj)
+        response = utilities.sendAndReceive(strings.GET, endpoint, body, header)
+        responseObj = json.loads(response.decode(strings.DECODER))
+        # verifies that Login was successful, reacts accordingly
+        utilities.verifyResponse(responseObj)
         return responseObj
 
     '''
-    getId
-    @return the ID number of this CachedUser
+    refreshFromServer
+    refreshes User's information
     '''
-    def getId(self):
-        return self.id
+    def refreshUser(self):
+        endpoint = strings.USER
+        body = urllib.urlencode({strings.USERNAME : self.username})
+        header = {strings.API_KEY : self.apiKey}
+        utilities.sendAndReceive(strings.GET, endpoint, body, header)
 
     '''
-    getApiKey
-    @return the API Key of this CachedUser
+    getUsername
+    @return this User's location
     '''
-    def getApiKey(self):
+    def getUsername(self):
+        return self.username
+
+    '''
+    getLoc
+    @return this User's location
+    '''
+    def getLoc(self):
+        return self.loc
+
+    '''
+    getKey
+    @return the API Key of this User
+    '''
+    def getKey(self):
         return self.apiKey
-
-    '''
-    getLocations
-    @return this CachedUser's list of locations
-    '''
-    def getLocs(self):
-        return self.locs
-
-    '''
-    addLocation
-    adds a location to this CachedUser's list of locations
-    @param loc: LocationVitals
-    '''
-    def addLoc(self, loc):
-        endpoint = "/cloud/json/location"
-        body = "{location:" + toolkit.toJson(loc) + "}"
-        header = {"Content-Type" : "application/json", "PRESENCE_API_KEY" : self.apiKey}
-        response = toolkit.sendAndReceive("POST", endpoint, body, header)
-        # verify that GET command was successful
-        toolkit.verifyResponse(json.loads(response.decode("utf-8")))

@@ -1,44 +1,48 @@
 '''
+device
 Created on June 25, 2013
 @author: Arun Varma
 '''
-import toolkit
-import urllib.parse as urllib
+import json
+import utilities, strings
 
 
 '''
 register
 registers this device with the cloud
-@param aUser: User
-@param deviceId: String
-@param productId: int
-@param desc: String (user description of the device)
+@param user: User
+@param deviceId: String (case sensitive, without spaces)
+@param productId: int 
 '''
-def register(aUser, deviceId, productId, desc):
-    apiKey = aUser.getApiKey()
-    loc = aUser.getLocs().pop()
-    endpoint = "/cloud/json/deviceRegistration/" + (loc.getId()).__str__() + "/" + deviceId
-    body = urllib.urlencode({"productId" : productId})
-    header = {"PRESENCE_API_KEY" : apiKey}
-    # send product ID and API Key to endpoint site as http "POST" command, receive response
-    toolkit.sendAndReceive("POST", endpoint, body, header)
-    print("Device registered with ID " + deviceId)
-    return Device(aUser, deviceId, loc, desc)
+def register(user, deviceId, productId, desc = None):
+    for ch in deviceId:
+        if ch == " ":
+            raise Exception("Device ID cannot contain spaces")
+    loc = user.getLoc()
+    endpoint = strings.LOCATIONS + loc.getId().__str__() + strings.LOCATION_DEVICES + deviceId + strings.DEVICE_PRODUCT_ID + productId.__str__()
+    header = {strings.API_KEY : user.getKey()}
+    # sends product ID and API Key to endpoint site as http "POST" command, receives response
+    response = utilities.sendAndReceive(strings.POST, endpoint, None, header)
+    responseObj = json.loads(response.decode(strings.DECODER))
+    # verifies that register device was successful, reacts accordingly
+    utilities.verifyResponse(responseObj)
+    print('Device with ID "' + deviceId + '" registered')
+    return Device(user, deviceId, loc, desc)
 
 
-'''
-getParams
-gets specified parameters of this device
-if params is not specified, will return the last known parameters
-@param params: Parameter
-'''
-def getParams(self, deviceId = None, params = None, index = None):
-    endpoint = "/cloud/json/parameters"
-    body = {}
-    header = {"PRESENCE_API_KEY" : self.apiKey}
-    toolkit.sendAndReceive("GET", endpoint, body, header)
-    print(self.username + " refreshed")
-
+class DeviceVitals(object):
+    '''
+    __init__
+    defines a device object with a unique deviceId, a user, a description and a location
+    @param deviceId: String (case sensitive with no spaces)
+    @param user: User
+    @param desc: String (user description of the device)
+    @param loc: Location
+    '''
+    def __init__(self, deviceId = None, loc = None, desc = None):
+        self.id = deviceId
+        self.location = loc
+        self.desc = desc
 
 class Device(object):
     '''
@@ -49,8 +53,12 @@ class Device(object):
     @param desc: String (user description of the device)
     @param loc: Location
     '''
-    def __init__(self, aUser, deviceId, loc, desc):
-        self.user = aUser
+    def __init__(self, user, deviceId, loc, desc = None):
+        # verifies that device ID only contains valid characters
+        for char in deviceId:
+            if char == " ":
+                raise Exception("Device ID cannot contain spaces")
+        self.user = user
         self.id = deviceId
         self.loc = loc
         self.desc = desc
@@ -73,11 +81,20 @@ class Device(object):
             params = self.getParams()
 
     '''
-    getUser
-    returns the user of this device
+    nickname
+    sets the device's description to given desc
+    @param desc: String
     '''
-    def getUser(self):
-        return self.user
+    def nickname(self, nickname):
+        forJson = DeviceVitals(desc = nickname)
+        endpoint = strings.DEVICES + self.id
+        header = {strings.CONTENT_TYPE : strings.JSON_APPLICATION, strings.API_KEY : self.user.getKey()}
+        body = '{"device": ' + utilities.toJson(forJson) + "}"
+        # sends product ID and API Key to endpoint site as http "POST" command, receives response
+        response = utilities.sendAndReceive(strings.PUT, endpoint, body, header)
+        utilities.verifyResponse(json.loads(response.decode(strings.DECODER)))
+        self.desc = nickname
+        print("Device description updated: " + nickname)
 
     '''
     getDeviceId
@@ -95,7 +112,16 @@ class Device(object):
 
     '''
     getDesc
-    returns the description of this device
+    returns the description (nickname) of this device
     '''
     def getDesc(self):
         return self.desc
+
+    '''
+    getParams
+    gets specified parameters of this device
+    if params is not specified, will return the last known parameters
+    @param params: Parameter
+    '''
+    def getParams(self, params = None):
+        return
