@@ -54,13 +54,13 @@ def verifyResponse(responseObj):
 
 '''
 setVal
-returns the corresponding value to key in locDict; returns None if not found in dictionary
+returns the corresponding value to key in dictionary; returns None if not found in dictionary
 @param key: String
-@param locDict: dictionary with location properties
+@param dictionary: dictionary
 '''
-def setVal(key, locDict):
+def setVal(key, dictionary):
     # if key is found in locDict, return corresponding value
-    if key in locDict:
-        return locDict[key]
+    if key in dictionary:
+        return dictionary[key]
     else:
         return None

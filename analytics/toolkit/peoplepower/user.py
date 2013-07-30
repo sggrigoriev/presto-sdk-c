@@ -4,7 +4,7 @@ Created on June 25, 2013
 @author: Arun Varma
 '''
 import utilities, strings
-import loc
+import loc, device
 import json
 import urllib.parse as urllib
 
@@ -100,15 +100,33 @@ class User(object):
     '''
     def __init__(self, apiKey):
         self.apiKey = apiKey
-        responseObj = self.getInfo()
-        userInfo = responseObj["user"]
+        info = self.getInfo()
+        # extract information about user and cache it in the user object
+        userInfo = info["user"]
         self.username = userInfo["userName"]
-        locDict = responseObj["locations"].pop()
+        # extract information about user's location and cache it in user object
+        locDict = info["locations"].pop()
         self.loc = loc.toLoc(self, locDict)
+        # extract information about user's devices and cache it in user object
+        self.devices = []
+        devInfo = self.getDeviceInfo()["devices"]
+        while devInfo:
+            curDev = device.toDevice(self, devInfo.pop())
+            self.devices.append(curDev)
+
+    '''
+    refreshFromServer
+    refreshes User's information
+    '''
+    def refreshUser(self):
+        endpoint = strings.USER
+        body = urllib.urlencode({strings.USERNAME : self.username})
+        header = {strings.API_KEY : self.apiKey}
+        utilities.sendAndReceive(strings.GET, endpoint, body, header)
 
     '''
     getInfo
-    returns a JSON object containing all known details about User and associated Locations
+    returns a JSON object from the server containing all known details about User and associated Locations
     '''
     def getInfo(self):
         endpoint = strings.USER
@@ -122,14 +140,19 @@ class User(object):
         return responseObj
 
     '''
-    refreshFromServer
-    refreshes User's information
+    getDeviceInfo
+    returns a dictionary from the server containing all devices belonging to user
     '''
-    def refreshUser(self):
-        endpoint = strings.USER
-        body = urllib.urlencode({strings.USERNAME : self.username})
+    def getDeviceInfo(self):
+        endpoint = strings.DEVICES
+        body = None
         header = {strings.API_KEY : self.apiKey}
-        utilities.sendAndReceive(strings.GET, endpoint, body, header)
+        # sends API Key to endpoint site as http "GET" command, receives response
+        response = utilities.sendAndReceive(strings.GET, endpoint, body, header)
+        responseObj = json.loads(response.decode(strings.DECODER))
+        # verifies that Login was successful, reacts accordingly
+        utilities.verifyResponse(responseObj)
+        return responseObj
 
     '''
     getUsername
@@ -151,3 +174,18 @@ class User(object):
     '''
     def getKey(self):
         return self.apiKey
+
+    '''
+    getDevices
+    returns a list of devices belonging to the user
+    '''
+    def getDevices(self):
+        return self.devices
+
+    '''
+    addDevice
+    @param dev: Device
+    adds a device object to user's list of devices
+    '''
+    def addDevice(self, dev):
+        self.devices.append(dev)

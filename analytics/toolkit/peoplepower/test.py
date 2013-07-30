@@ -21,7 +21,7 @@ if __name__ == '__main__':
     user
     '''
     #createAccount
-    us1 = user.createAccount("testing+14@peoplepowerco.com", "password", "FirstApp", "testing+14@peoplepowerco.com", loc) #successful
+    us1 = user.createAccount("testing+15@peoplepowerco.com", "password", "FirstApp", "testing+15@peoplepowerco.com", loc) #successful
     try:
         user.createAccount("testing@peoplepowerco.com", "password", "FirstApp", "testing@peoplepowerco.com", loc) #duplicate account
     except:
@@ -55,8 +55,8 @@ if __name__ == '__main__':
     device
     '''
     #register
-    dev1 = device.register(us1, "id-17", 3) #successful
-    dev2 = device.register(us1, "id-18", 3, "new device") #successful - device with description
+    dev1 = device.register(us1, "id-19", 3) #successful
+    dev2 = device.register(us1, "id-20", 3, "new device") #successful - device with description
     try:
         device.register(us1, "an id", 3) #invalid device id
     except:

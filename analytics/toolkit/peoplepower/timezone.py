@@ -13,5 +13,7 @@ class Timezone:
     '''
     def __init__(self, idNo, offset = None, dst = None):
         self.id = idNo
-        self.offset = offset
-        self.dst = dst
+        if offset != None:
+            self.offset = offset
+        if dst != None:
+            self.dst = dst

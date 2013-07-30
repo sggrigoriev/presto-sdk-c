@@ -8,6 +8,21 @@ import utilities, strings
 
 
 '''
+toDevice
+converts devDict to a device object
+@param user: User
+@param devDict: dictionary containing the properties of a device
+'''
+def toDevice(user, devDict):
+    # if values are found in devDict, store them
+    deviceId = utilities.setVal("id", devDict)
+    loc = utilities.setVal("locationId", devDict)
+    productId = utilities.setVal("type", devDict)
+    # return device object with these values
+    return Device(user, deviceId, productId, loc)
+
+
+'''
 register
 registers this device with the cloud
 @param user: User
@@ -27,7 +42,9 @@ def register(user, deviceId, productId, desc = None):
     # verifies that register device was successful, reacts accordingly
     utilities.verifyResponse(responseObj)
     print('Device with ID "' + deviceId + '" registered')
-    return Device(user, deviceId, loc, desc)
+    toReturn = Device(user, deviceId, productId, loc, desc)
+    user.addDevice(toReturn)
+    return toReturn
 
 
 class DeviceVitals(object):
@@ -35,31 +52,34 @@ class DeviceVitals(object):
     __init__
     defines a device object with a unique deviceId, a user, a description and a location
     @param deviceId: String (case sensitive with no spaces)
-    @param user: User
+    @param productId: int
     @param desc: String (user description of the device)
     @param loc: Location
     '''
-    def __init__(self, deviceId = None, loc = None, desc = None):
+    def __init__(self, deviceId = None, productId = None, loc = None, desc = None):
         self.id = deviceId
         self.location = loc
+        self.productId = productId
         self.desc = desc
 
 class Device(object):
     '''
     __init__
     defines a device object with a unique deviceId, a user, a description and a location
-    @param deviceId: String (case sensitive with no spaces)
     @param user: User
+    @param deviceId: String (case sensitive with no spaces)
+    @param productId: int
     @param desc: String (user description of the device)
     @param loc: Location
     '''
-    def __init__(self, user, deviceId, loc, desc = None):
+    def __init__(self, user, deviceId, productId, loc, desc = None):
         # verifies that device ID only contains valid characters
         for char in deviceId:
             if char == " ":
                 raise Exception("Device ID cannot contain spaces")
         self.user = user
         self.id = deviceId
+        self.type = productId
         self.loc = loc
         self.desc = desc
 
@@ -104,6 +124,13 @@ class Device(object):
         return self.id
 
     '''
+    getType
+    returns the type (product ID) of this device
+    '''
+    def getType(self):
+        return self.type
+
+    '''
     getLoc
     returns the location of this device
     '''
@@ -116,6 +143,14 @@ class Device(object):
     '''
     def getDesc(self):
         return self.desc
+
+    '''
+    setDesc
+    sets the device's description (nickname) to desc
+    @param desc: String
+    '''
+    def setDesc(self, desc):
+        self.desc = desc
 
     '''
     getParams
