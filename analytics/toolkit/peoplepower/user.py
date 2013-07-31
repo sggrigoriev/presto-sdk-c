@@ -159,6 +159,21 @@ class User(object):
         return responseObj
 
     '''
+    populateParams
+    @return the most recent measurements of the user
+    '''
+    def populateParams(self):
+        endpoint = strings.PARAMS
+        body = None
+        header = {strings.API_KEY : self.apiKey}
+        # sends API Key to endpoint site as http "GET" command, receives response
+        response = utilities.sendAndReceive(strings.GET, endpoint, body, header)
+        responseObj = json.loads(response.decode(strings.DECODER))
+        # verifies that Login was successful, reacts accordingly
+        utilities.verifyResponse(responseObj)
+        return responseObj
+
+    '''
     getUsername
     @return this User's location
     '''

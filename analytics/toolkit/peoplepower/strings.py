@@ -20,6 +20,10 @@ EXPIRY = "&expiry="
 # device
 DEVICES = URL_EXT + "devices/"
 DEVICE_PRODUCT_ID = "?productId="
+# parameters
+PARAMS = URL_EXT + "parameters"
+PARAMS_DEVICE = PARAMS + "?deviceId="
+PARAM_NAME = "&paramName="
 # location
 LOCATIONS = URL_EXT + "locations/"
 LOCATION_DEVICES = "/devices/"

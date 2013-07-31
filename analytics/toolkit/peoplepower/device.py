@@ -99,23 +99,35 @@ class Device(object):
     '''
     def getInfo(self):
         endpoint = strings.DEVICES + self.id
+        body = None
         header = {strings.API_KEY : self.user.getKey()}
         # sends device ID and API Key to endpoint site as http "GET" command, receives response
-        response = utilities.sendAndReceive(strings.GET, endpoint, None, header)
+        response = utilities.sendAndReceive(strings.GET, endpoint, body, header)
         responseObj = json.loads(response.decode(strings.DECODER))
         # verifies that register device was successful, reacts accordingly
         utilities.verifyResponse(responseObj)
         return responseObj
 
     '''
-    populate
+    populateParams
     populates specified parameters of this device with current information
     if params is not specified, the last known parameters will be populated
-    @param params: Parameter[]
+    @param params: String[]
     '''
-    def populate(self, params = None):
-        if params == None:
-            params = self.getParams()
+    def populateParams(self, params = None):
+        endpoint = strings.PARAMS_DEVICE + self.id
+        if params != None:
+            while params:
+                endpoint += strings.PARAM_NAME + params.pop()
+        print(endpoint)
+        header = {strings.API_KEY : self.user.getKey()}
+        body = None
+        # sends device ID and API Key to endpoint site as http "GET" command, receives response
+        response = utilities.sendAndReceive(strings.GET, endpoint, body, header)
+        responseObj = json.loads(response.decode(strings.DECODER))
+        # verifies that register device was successful, reacts accordingly
+        utilities.verifyResponse(responseObj)
+        return responseObj
 
     '''
     nickname
@@ -160,12 +172,3 @@ class Device(object):
     '''
     def getDesc(self):
         return self.desc
-
-    '''
-    getParams
-    gets specified parameters of this device
-    if params is not specified, will return the last known parameters
-    @param params: Parameter
-    '''
-    def getParams(self, params = None):
-        return
