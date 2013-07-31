@@ -5,15 +5,6 @@ Created on June 25, 2013
 
 
 '''
-getProductId
-returns the Product ID of the given device
-@param deviceId: int
-'''
-def getProductId(deviceId):
-    return
-
-
-'''
 user
 
 @param apiKey: String

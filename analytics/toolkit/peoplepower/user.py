@@ -6,7 +6,6 @@ Created on June 25, 2013
 import utilities, strings
 import loc, device
 import json
-import urllib.parse as urllib
 
 
 '''
@@ -100,6 +99,14 @@ class User(object):
     '''
     def __init__(self, apiKey):
         self.apiKey = apiKey
+        self.refreshInfo()
+        self.refreshDevices()
+
+    '''
+    refreshFromServer
+    refreshes User's information from server
+    '''
+    def refreshInfo(self):
         info = self.getInfo()
         # extract information about user and cache it in the user object
         userInfo = info["user"]
@@ -107,22 +114,19 @@ class User(object):
         # extract information about user's location and cache it in user object
         locDict = info["locations"].pop()
         self.loc = loc.toLoc(self, locDict)
-        # extract information about user's devices and cache it in user object
-        self.devices = []
-        devInfo = self.getDeviceInfo()["devices"]
-        while devInfo:
-            curDev = device.toDevice(self, devInfo.pop())
-            self.devices.append(curDev)
 
     '''
-    refreshFromServer
-    refreshes User's information
+    refreshDevices
+    refreshes all of User's devices from server
     '''
-    def refreshUser(self):
-        endpoint = strings.USER
-        body = urllib.urlencode({strings.USERNAME : self.username})
-        header = {strings.API_KEY : self.apiKey}
-        utilities.sendAndReceive(strings.GET, endpoint, body, header)
+    def refreshDevices(self):
+        devInfo = self.getDeviceInfo()["devices"]
+        # extract information about user's devices and cache it in user object
+        self.devices = []
+        while devInfo:
+            curDev = device.toDevice(self, devInfo.pop())
+            curDev.refreshInfo()
+            self.devices.append(curDev)
 
     '''
     getInfo

@@ -5,6 +5,7 @@ Created on June 25, 2013
 '''
 import json
 import utilities, strings
+import loc
 
 
 '''
@@ -16,10 +17,9 @@ converts devDict to a device object
 def toDevice(user, devDict):
     # if values are found in devDict, store them
     deviceId = utilities.setVal("id", devDict)
-    loc = utilities.setVal("locationId", devDict)
     productId = utilities.setVal("type", devDict)
     # return device object with these values
-    return Device(user, deviceId, productId, loc)
+    return Device(user, deviceId, productId)
 
 
 '''
@@ -29,20 +29,21 @@ registers this device with the cloud
 @param deviceId: String (case sensitive, without spaces)
 @param productId: int 
 '''
-def register(user, deviceId, productId, desc = None):
+def register(user, deviceId, productId):
     for ch in deviceId:
         if ch == " ":
             raise Exception("Device ID cannot contain spaces")
     loc = user.getLoc()
     endpoint = strings.LOCATIONS + loc.getId().__str__() + strings.LOCATION_DEVICES + deviceId + strings.DEVICE_PRODUCT_ID + productId.__str__()
+    body = None
     header = {strings.API_KEY : user.getKey()}
     # sends product ID and API Key to endpoint site as http "POST" command, receives response
-    response = utilities.sendAndReceive(strings.POST, endpoint, None, header)
+    response = utilities.sendAndReceive(strings.POST, endpoint, body, header)
     responseObj = json.loads(response.decode(strings.DECODER))
     # verifies that register device was successful, reacts accordingly
     utilities.verifyResponse(responseObj)
     print('Device with ID "' + deviceId + '" registered')
-    toReturn = Device(user, deviceId, productId, loc, desc)
+    toReturn = Device(user, deviceId, productId)
     user.addDevice(toReturn)
     return toReturn
 
@@ -70,25 +71,41 @@ class Device(object):
     @param deviceId: String (case sensitive with no spaces)
     @param productId: int
     @param desc: String (user description of the device)
-    @param loc: Location
     '''
-    def __init__(self, user, deviceId, productId, loc, desc = None):
-        # verifies that device ID only contains valid characters
-        for char in deviceId:
-            if char == " ":
-                raise Exception("Device ID cannot contain spaces")
+    def __init__(self, user, deviceId, productId):
         self.user = user
+        self.loc = user.getLoc()
         self.id = deviceId
         self.type = productId
-        self.loc = loc
-        self.desc = desc
+        self.desc = None
 
     '''
-    refreshDevicesFromServer
-    ?????????????????????????
+    refreshFromServer
+    refreshes Device's information from server
     '''
-    def refreshDevicesFromServer(self):
-        return
+    def refreshInfo(self):
+        info = self.getInfo()
+        # extract device information and update device properties correspondingly
+        devInfo = info["device"]
+        self.id = devInfo["id"]
+        self.type = devInfo["type"]
+        self.desc = utilities.setVal("desc", devInfo)
+        # extract location information and update device properties correspondingly
+        self.loc = loc.toLoc(self.user, info["location"])
+
+    '''
+    getInfo
+    returns a JSON object from the server containing all known details about Device
+    '''
+    def getInfo(self):
+        endpoint = strings.DEVICES + self.id
+        header = {strings.API_KEY : self.user.getKey()}
+        # sends device ID and API Key to endpoint site as http "GET" command, receives response
+        response = utilities.sendAndReceive(strings.GET, endpoint, None, header)
+        responseObj = json.loads(response.decode(strings.DECODER))
+        # verifies that register device was successful, reacts accordingly
+        utilities.verifyResponse(responseObj)
+        return responseObj
 
     '''
     populate
@@ -143,14 +160,6 @@ class Device(object):
     '''
     def getDesc(self):
         return self.desc
-
-    '''
-    setDesc
-    sets the device's description (nickname) to desc
-    @param desc: String
-    '''
-    def setDesc(self, desc):
-        self.desc = desc
 
     '''
     getParams
