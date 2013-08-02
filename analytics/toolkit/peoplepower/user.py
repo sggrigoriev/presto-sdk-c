@@ -47,6 +47,8 @@ def login(username, password, expiry = None):
     endpoint = strings.USER_LOGIN + username
     if expiry != None:
         endpoint += strings.EXPIRY + expiry
+    else:
+        endpoint += strings.EXPIRY + -1
     header = {strings.PASSWORD : password}
     # sends username and password to endpoint site as http "POST" command, receives response
     response = utilities.sendAndReceive(strings.GET, endpoint, None, header)
