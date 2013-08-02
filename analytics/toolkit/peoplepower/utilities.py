@@ -3,14 +3,16 @@ utilities
 Created on July 14, 2013
 @author: Arun Varma
 '''
-import http.client as http, json
-import strings
+import http.client as http
+import peoplepower.strings as strings
+from peoplepower.error import ApiError
+import json
 
 
 # result code for successful action
 SUCCESS = 0
 
-
+    
 '''
 toJson
 returns a JSON representation of the given object
@@ -50,8 +52,8 @@ def verifyResponse(responseObj):
     resultCode = responseObj["resultCode"]
     # if action was not successful, throw an error corresponding to result code
     if resultCode != SUCCESS:
-        raise Exception("(" + resultCode.__str__() + ") " + responseObj["resultCodeDesc"] + ": " + responseObj["resultCodeMessage"])
-
+        raise ApiError(responseObj["resultCode"], responseObj["resultCodeDesc"], responseObj["resultCodeMessage"])
+    
 '''
 setVal
 returns the corresponding value to key in dictionary; returns None if not found in dictionary
@@ -64,3 +66,8 @@ def setVal(key, dictionary):
         return dictionary[key]
     else:
         return None
+    
+
+
+    
+    

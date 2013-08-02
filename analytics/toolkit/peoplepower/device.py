@@ -4,8 +4,9 @@ Created on June 25, 2013
 @author: Arun Varma
 '''
 import json
-import utilities, strings
-import loc
+import peoplepower.utilities as utilities
+import peoplepower.strings as strings
+import peoplepower.loc as loc
 
 
 '''

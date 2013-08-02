@@ -3,8 +3,10 @@ user
 Created on June 25, 2013
 @author: Arun Varma
 '''
-import utilities, strings
-import loc, device
+import peoplepower.utilities as utilities
+import peoplepower.strings as strings
+import peoplepower.loc as loc
+import peoplepower.device as device
 import json
 
 
@@ -48,14 +50,13 @@ def login(username, password, expiry = None):
     if expiry != None:
         endpoint += strings.EXPIRY + expiry
     else:
-        endpoint += strings.EXPIRY + -1
+        endpoint += strings.EXPIRY + '-1'
     header = {strings.PASSWORD : password}
     # sends username and password to endpoint site as http "POST" command, receives response
     response = utilities.sendAndReceive(strings.GET, endpoint, None, header)
     responseObj = json.loads(response.decode(strings.DECODER))
     # verifies that Login was successful, reacts accordingly
     utilities.verifyResponse(responseObj)
-    print("Logged onto account " + username)
     return User(responseObj["key"])
 
 

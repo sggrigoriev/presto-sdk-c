@@ -3,7 +3,7 @@ loc
 Created on June 25, 2013
 @author: Arun Varma
 '''
-import utilities
+import peoplepower.utilities as utilities
 
 
 '''
