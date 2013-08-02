@@ -6,7 +6,6 @@ Created on June 25, 2013
 import peoplepower.utilities as utilities
 import peoplepower.strings as strings
 import peoplepower.loc as loc
-import peoplepower.device as device
 import json
 
 
@@ -57,7 +56,7 @@ def login(username, password, expiry = None):
     responseObj = json.loads(response.decode(strings.DECODER))
     # verifies that Login was successful, reacts accordingly
     utilities.verifyResponse(responseObj)
-    return User(responseObj["key"])
+    return User(username, responseObj["key"])
 
 
 '''
@@ -100,66 +99,44 @@ class User(object):
     defines a CachedUser object with a unique userId and list of locations where they have put devices
     @param apiKey: String
     '''
-    def __init__(self, apiKey):
+    def __init__(self, username, apiKey):
+        self.username = username
         self.apiKey = apiKey
-        self.refreshInfo()
-        self.refreshDevices()
+        self.refresh()
+    
+    
+    def __str__(self):
+        myString = "User " + str(self.username) + " with ID " + str(self.userId) + "\n"
+        for loc in self.locations:
+            myString += "\t+ Location " + str(loc.getName()) +" with ID " + str(loc.getId()) +"\n"
+            
+            for device in loc.getDevices():
+                myString += "\t\t+ Device " + str(device.getDesc()) + " is ID " + str(device.getId()) + " of type " + str(device.getType()) + "\n"
+                
+        return myString;
 
     '''
-    refreshFromServer
+    refresh
     refreshes User's information from server
     '''
-    def refreshInfo(self):
-        info = self.getInfo()
-        # extract information about user and cache it in the user object
-        userInfo = info["user"]
-        self.username = userInfo["userName"]
-        # extract information about user's location and cache it in user object
-        locDict = info["locations"].pop()
-        self.loc = loc.toLoc(self, locDict)
-
-    '''
-    refreshDevices
-    refreshes all of User's devices from server
-    '''
-    def refreshDevices(self):
-        devInfo = self.getDeviceInfo()["devices"]
-        # extract information about user's devices and cache it in user object
-        self.devices = []
-        while devInfo:
-            curDev = device.toDevice(self, devInfo.pop())
-            curDev.refreshInfo()
-            self.devices.append(curDev)
-
-    '''
-    getInfo
-    returns a JSON object from the server containing all known details about User and associated Locations
-    '''
-    def getInfo(self):
+    def refresh(self):
         endpoint = strings.USER
         body = None
         header = {strings.API_KEY : self.apiKey}
         # sends API Key to endpoint site as http "GET" command, receives response
         response = utilities.sendAndReceive(strings.GET, endpoint, body, header)
-        responseObj = json.loads(response.decode(strings.DECODER))
+        info = json.loads(response.decode(strings.DECODER))
         # verifies that Login was successful, reacts accordingly
-        utilities.verifyResponse(responseObj)
-        return responseObj
-
-    '''
-    getDeviceInfo
-    returns a dictionary from the server containing all devices belonging to user
-    '''
-    def getDeviceInfo(self):
-        endpoint = strings.DEVICES
-        body = None
-        header = {strings.API_KEY : self.apiKey}
-        # sends API Key to endpoint site as http "GET" command, receives response
-        response = utilities.sendAndReceive(strings.GET, endpoint, body, header)
-        responseObj = json.loads(response.decode(strings.DECODER))
-        # verifies that Login was successful, reacts accordingly
-        utilities.verifyResponse(responseObj)
-        return responseObj
+        utilities.verifyResponse(info)
+        # extract information about user and cache it in the user object
+        userInfo = info["user"]
+        self.userId = userInfo["id"]
+        # extract information about user's location and cache it in user object
+        locDict = info["locations"]
+        self.locations = []
+        while locDict:
+            curLoc = loc.toLoc(self, locDict.pop())
+            self.locations.append(curLoc)
 
     '''
     populateParams
@@ -182,32 +159,25 @@ class User(object):
     '''
     def getUsername(self):
         return self.username
-
+    
+    '''
+    getUserId
+    @return this User's ID
+    '''
+    def getUserId(self):
+        return self.userId
+    
     '''
     getLoc
     @return this User's location
     '''
-    def getLoc(self):
-        return self.loc
-
+    def getLocations(self):
+        return self.locations
+    
     '''
     getKey
     @return the API Key of this User
     '''
     def getKey(self):
         return self.apiKey
-
-    '''
-    getDevices
-    returns a list of devices belonging to the user
-    '''
-    def getDevices(self):
-        return self.devices
-
-    '''
-    addDevice
-    @param dev: Device
-    adds a device object to user's list of devices
-    '''
-    def addDevice(self, dev):
-        self.devices.append(dev)
+    

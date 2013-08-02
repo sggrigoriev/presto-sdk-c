@@ -4,6 +4,9 @@ Created on June 25, 2013
 @author: Arun Varma
 '''
 import peoplepower.utilities as utilities
+import peoplepower.strings as strings
+import peoplepower.device as device
+import json
 
 
 '''
@@ -74,14 +77,28 @@ class Loc(object):
         self.state = state
         self.country = country
         self.zip = zipcode
+        self.refresh()
 
     '''
-    refreshFromServer
-    ????????????????????????????
+    refreshDevices
+    refreshes all of User's devices from server
     '''
-    def refreshFromServer(self):
-        return
-
+    def refresh(self):
+        endpoint = strings.DEVICES
+        body = None
+        header = {strings.API_KEY : self.user.getKey()}
+        # sends API Key to endpoint site as http "GET" command, receives response
+        response = utilities.sendAndReceive(strings.GET, endpoint, body, header)
+        responseObj = json.loads(response.decode(strings.DECODER))
+        # verifies that Login was successful, reacts accordingly
+        utilities.verifyResponse(responseObj)
+        devInfo = responseObj["devices"]
+        # extract information about user's devices and cache it in user object
+        self.devices = []
+        while devInfo:
+            curDev = device.toDevice(self, devInfo.pop())
+            self.devices.append(curDev)
+    
     '''
     addDevice
     adds the given device to this Location's list of devices
@@ -90,6 +107,13 @@ class Loc(object):
     def addDevice(self, device):
         self.devices.add(device)
 
+    '''
+    getDevices
+    returns a list of devices belonging to the user
+    '''
+    def getDevices(self):
+        return self.devices
+    
     '''
     getUser
     @return the user at this Location
@@ -110,10 +134,3 @@ class Loc(object):
     '''
     def getName(self):
         return self.name
-
-    '''
-    getDevices
-    @return the list of Devices at this Location
-    '''
-    def getDevices(self):
-        return self.devices

@@ -24,4 +24,4 @@ except ApiError as error:
     print(error.message)
     exit(1)
 
-print("Logged in: " + user.apiKey)
+print(user)
