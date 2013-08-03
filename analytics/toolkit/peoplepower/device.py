@@ -95,9 +95,9 @@ class Device(object):
         
         # extract device information and update device properties correspondingly
         devInfo = info["device"]
-        self.id = devInfo["id"]
-        self.type = devInfo["type"]
-        self.desc = utilities.setVal("desc", devInfo)
+        self.id = devInfo.get("id", None)
+        self.type = devInfo.get("type", None)
+        self.desc = devInfo.get("desc", None)
 
     '''
     populateParams

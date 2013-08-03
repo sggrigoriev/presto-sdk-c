@@ -53,21 +53,6 @@ def verifyResponse(responseObj):
     # if action was not successful, throw an error corresponding to result code
     if resultCode != SUCCESS:
         raise ApiError(responseObj["resultCode"], responseObj["resultCodeDesc"], responseObj["resultCodeMessage"])
-    
-'''
-setVal
-returns the corresponding value to key in dictionary; returns None if not found in dictionary
-@param key: String
-@param dictionary: dictionary
-'''
-def setVal(key, dictionary):
-    # if key is found in locDict, return corresponding value
-    if key in dictionary:
-        return dictionary[key]
-    else:
-        return None
-    
-
 
     
     

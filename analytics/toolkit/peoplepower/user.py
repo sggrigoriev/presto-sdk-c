@@ -114,7 +114,7 @@ class User(object):
                 myString += "\t\t+ Device " + str(device.getDesc()) + " is ID " + str(device.getId()) + " of type " + str(device.getType()) + "\n"
                 
                 for param in device.getParameters():
-                    myString += "\t\t\t+ Parameter " + str(param["name"]) + " at index " + str(param["index"]) + " has value " + str(param["value"]) + " last updated " + str(param["lastUpdateTime"]) + "\n"
+                    myString += "\t\t\t+ Parameter " + str(param["name"]) + " at index " + str(param["index"]) + " has value " + str(param["value"]) + "\n"
                 
         return myString;
 
