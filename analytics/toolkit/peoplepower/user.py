@@ -113,6 +113,9 @@ class User(object):
             for device in loc.getDevices():
                 myString += "\t\t+ Device " + str(device.getDesc()) + " is ID " + str(device.getId()) + " of type " + str(device.getType()) + "\n"
                 
+                for param in device.getParameters():
+                    myString += "\t\t\t+ Parameter " + str(param["name"]) + " at index " + str(param["index"]) + " has value " + str(param["value"]) + " last updated " + str(param["lastUpdateTime"]) + "\n"
+                
         return myString;
 
     '''

@@ -17,15 +17,15 @@ converts locDict to a location object
 '''
 def toLoc(user, locDict):
     # if values are found in locDict, store them
-    locId = utilities.setVal("id", locDict)
-    name = utilities.setVal("name", locDict)
-    timezone = utilities.setVal("timezone", locDict)
-    addrStreet1 = utilities.setVal("addrStreet1", locDict)
-    addrStreet2 = utilities.setVal("addrStreet2", locDict)
-    city = utilities.setVal("city", locDict)
-    state = utilities.setVal("state", locDict)
-    country = utilities.setVal("country", locDict)
-    zipcode = utilities.setVal("zipcode", locDict)
+    locId = locDict.get("id", None)
+    name = locDict.get("name", None)
+    timezone = locDict.get("timezone", None)
+    addrStreet1 = locDict.get("addrStreet1", None)
+    addrStreet2 = locDict.get("addrStreet2", None)
+    city = locDict.get("city", None)
+    state = locDict.get("state", None)
+    country = locDict.get("country", None)
+    zipcode = locDict.get("zipcode", None)
     # return location object with these values
     return Loc(user, locId, name, timezone, addrStreet1, addrStreet2, city, state, country, zipcode)
 
@@ -98,6 +98,34 @@ class Loc(object):
         while devInfo:
             curDev = device.toDevice(self, devInfo.pop())
             self.devices.append(curDev)
+        
+        self.refreshAllDeviceParameters()
+            
+    def refreshAllDeviceParameters(self):
+        endpoint = strings.PARAMS
+        body = None
+        header = {strings.API_KEY : self.user.getKey()}
+        # sends API Key to endpoint site as http "GET" command, receives response
+        response = utilities.sendAndReceive(strings.GET, endpoint, body, header)
+        responseObj = json.loads(response.decode(strings.DECODER))
+        # verifies that Login was successful, reacts accordingly
+        utilities.verifyResponse(responseObj)
+        print(response.decode(strings.DECODER))
+        
+        devInfo = responseObj["devices"]
+        while devInfo:
+            focusedDevInfo = devInfo.pop()
+            device = self.getDeviceById(focusedDevInfo["id"])
+            paramInfo = focusedDevInfo["parameters"]
+            while paramInfo:
+                focusedParamInfo = paramInfo.pop()
+                
+                device.setParameter(focusedParamInfo.get("name", None), 
+                                    focusedParamInfo.get("index", None),
+                                    focusedParamInfo.get("units", None), 
+                                    focusedParamInfo.get("multiplier", None),
+                                    focusedParamInfo.get("value", None),
+                                    focusedParamInfo.get("lastUpdateTime", None))
     
     '''
     addDevice
@@ -134,3 +162,16 @@ class Loc(object):
     '''
     def getName(self):
         return self.name
+    
+    '''
+    getDeviceById
+    @return the Device if it exists
+    '''
+    def getDeviceById(self, deviceId):
+        for device in self.devices:
+            if(device.getId() == deviceId):
+                return device
+        
+        return None
+    
+

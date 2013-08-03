@@ -15,10 +15,11 @@ converts devDict to a device object
 '''
 def toDevice(loc, devDict):
     # if values are found in devDict, store them
-    deviceId = utilities.setVal("id", devDict)
-    productId = utilities.setVal("type", devDict)
+    deviceId = devDict.get("id", None)
+    productId = devDict.get("type", None)
+    desc = devDict.get("desc", None)
     # return device object with these values
-    return Device(loc, deviceId, productId)
+    return Device(loc, deviceId, productId, desc)
 
 
 '''
@@ -70,12 +71,12 @@ class Device(object):
     @param productId: int
     @param desc: String (user description of the device)
     '''
-    def __init__(self, loc, deviceId, productId):
+    def __init__(self, loc, deviceId, productId, desc):
         self.loc = loc
         self.id = deviceId
         self.type = productId
-        self.desc = None
-        self.refresh()
+        self.desc = desc
+        self.parameters = []
 
     '''
     refreshFromServer
@@ -87,6 +88,7 @@ class Device(object):
         header = {strings.API_KEY : self.loc.getUser().getKey()}
         # sends device ID and API Key to endpoint site as http "GET" command, receives response
         response = utilities.sendAndReceive(strings.GET, endpoint, body, header)
+        print(response.decode(strings.DECODER))
         info = json.loads(response.decode(strings.DECODER))
         # verifies that register device was successful, reacts accordingly
         utilities.verifyResponse(info)
@@ -161,3 +163,55 @@ class Device(object):
     '''
     def getDesc(self):
         return self.desc
+    
+    '''
+    setParameter
+    Set the values of a local parameter
+    '''
+    def setParameter(self, name, index, units, multiplier, value, lastUpdateTime):
+        # TODO This is not how we really want to store parameters.
+        # we want to store parameters such that each parameter forms an array of values
+        # the array gets populated as we gather more information
+        # new measurements may come into the array at any moment.
+        # With the array of values formed out of a single parameter, we should be
+        # able track the trends of that parameter over time and come up with
+        # useful functions to analyze the patterns of that data.
+        param = self.getParameter(name, index)
+        if(param == None):
+            # Add a new parameter
+            param = {'name':name,
+                     'index':index,
+                     'units':units,
+                     'multiplier':multiplier,
+                     'value':value,
+                     'lastUpdateTime':lastUpdateTime}
+            self.parameters.append(param)
+            
+        else:
+            # Modify the existing parameter object
+            param["name"] = name
+            param["index"] = index
+            param["units"] = units
+            param["multiplier"] = multiplier
+            param["value"] = value
+            param["lastUpdateTime"] = lastUpdateTime
+    
+    '''
+    getParameter
+    Get a Parameter by name and index, None if it doesn't exist
+    '''
+    def getParameter(self, name, index):
+        for param in self.parameters:
+            if(param["name"] == name and param["index"] == index):
+                return param
+            
+        return None
+    
+    '''
+    getParameters
+    Get an array of all parameter dictionaries
+    '''
+    def getParameters(self):
+        return self.parameters
+    
+
