@@ -7,7 +7,7 @@ Created on August 2, 2013
 
 import argparse
 import peoplepower.user as user
-import uuid
+#import uuid
 
 from peoplepower.error import ApiError
 
@@ -28,4 +28,4 @@ except ApiError as error:
 if(args.verbose):
     print(user)
 
-print(uuid.uuid4())
+#print(uuid.uuid4())
