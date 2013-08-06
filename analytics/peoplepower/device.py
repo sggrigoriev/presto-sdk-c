@@ -28,8 +28,9 @@ registers this device with the cloud
 @param loc: Location
 @param deviceId: String (case sensitive, without spaces)
 @param productId: int 
+@param desc: String
 '''
-def register(loc, deviceId, productId):
+def register(loc, deviceId, productId, desc = None):
     for ch in deviceId:
         if ch == " ":
             raise Exception("Device ID cannot contain spaces")
@@ -42,7 +43,9 @@ def register(loc, deviceId, productId):
     # verifies that register device was successful, reacts accordingly
     utilities.verifyResponse(responseObj)
     print('Device with ID "' + deviceId + '" registered')
-    toReturn = Device(loc, deviceId, productId)
+    toReturn = Device(loc, deviceId, productId, None)
+    if desc != None:
+        toReturn.nickname(desc)
     loc.addDevice(toReturn)
     return toReturn
 
@@ -75,8 +78,8 @@ class Device(object):
         self.loc = loc
         self.id = deviceId
         self.type = productId
-        self.desc = desc
         self.parameters = []
+        self.desc = desc
 
     '''
     refreshFromServer
@@ -88,7 +91,6 @@ class Device(object):
         header = {strings.API_KEY : self.loc.getUser().getKey()}
         # sends device ID and API Key to endpoint site as http "GET" command, receives response
         response = utilities.sendAndReceive(strings.GET, endpoint, body, header)
-        print(response.decode(strings.DECODER))
         info = json.loads(response.decode(strings.DECODER))
         # verifies that register device was successful, reacts accordingly
         utilities.verifyResponse(info)

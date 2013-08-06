@@ -80,7 +80,7 @@ class Loc(object):
         self.refresh()
 
     '''
-    refreshDevices
+    refresh
     refreshes all of User's devices from server
     '''
     def refresh(self):
@@ -92,13 +92,15 @@ class Loc(object):
         responseObj = json.loads(response.decode(strings.DECODER))
         # verifies that Login was successful, reacts accordingly
         utilities.verifyResponse(responseObj)
-        devInfo = responseObj["devices"]
-        # extract information about user's devices and cache it in user object
+
         self.devices = []
-        while devInfo:
-            curDev = device.toDevice(self, devInfo.pop())
-            self.devices.append(curDev)
-        
+        if "devices" in responseObj:
+            devInfo = responseObj["devices"]
+            # extract information about user's devices and cache it in user object
+            while devInfo:
+                curDev = device.toDevice(self, devInfo.pop())
+                self.devices.append(curDev)
+
         self.refreshAllDeviceParameters()
             
     def refreshAllDeviceParameters(self):
@@ -110,7 +112,6 @@ class Loc(object):
         responseObj = json.loads(response.decode(strings.DECODER))
         # verifies that Login was successful, reacts accordingly
         utilities.verifyResponse(responseObj)
-        print(response.decode(strings.DECODER))
         
         devInfo = responseObj["devices"]
         while devInfo:
@@ -119,7 +120,7 @@ class Loc(object):
             paramInfo = focusedDevInfo["parameters"]
             while paramInfo:
                 focusedParamInfo = paramInfo.pop()
-                
+
                 device.setParameter(focusedParamInfo.get("name", None), 
                                     focusedParamInfo.get("index", None),
                                     focusedParamInfo.get("units", None), 
@@ -133,7 +134,7 @@ class Loc(object):
     @param device: Device
     '''
     def addDevice(self, device):
-        self.devices.add(device)
+        self.devices.append(device)
 
     '''
     getDevices

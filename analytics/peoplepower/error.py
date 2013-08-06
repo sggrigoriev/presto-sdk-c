@@ -16,6 +16,6 @@ class ApiError(Exception):
         self.resultCode = resultCode
         self.description = description
         self.message = message
-        
+
     def __str__(self):
         return self.message

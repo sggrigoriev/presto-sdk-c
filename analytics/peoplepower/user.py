@@ -34,7 +34,7 @@ def createAccount(username, password, appName, email, loc, firstName = None, las
     # verifies that Create Account was successful, reacts accordingly
     utilities.verifyResponse(responseObj)
     print('User "' + username + '" created')
-    return User(responseObj["key"])
+    return User(username, responseObj["key"])
 
 
 '''
@@ -56,6 +56,7 @@ def login(username, password, expiry = None):
     responseObj = json.loads(response.decode(strings.DECODER))
     # verifies that Login was successful, reacts accordingly
     utilities.verifyResponse(responseObj)
+    print('User "' + username + '" logged in')
     return User(username, responseObj["key"])
 
 
@@ -183,4 +184,3 @@ class User(object):
     '''
     def getKey(self):
         return self.apiKey
-    

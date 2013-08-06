@@ -21,7 +21,7 @@ if __name__ == '__main__':
     user
     '''
     #createAccount
-    us1 = user.createAccount("testing+15@peoplepowerco.com", "password", "FirstApp", "testing+15@peoplepowerco.com", loc) #successful
+    us1 = user.createAccount("testing+30@peoplepowerco.com", "password", "FirstApp", "testing+30@peoplepowerco.com", loc) #successful
     try:
         user.createAccount("testing@peoplepowerco.com", "password", "FirstApp", "testing@peoplepowerco.com", loc) #duplicate account
     except:
@@ -41,8 +41,8 @@ if __name__ == '__main__':
     except:
         print("Username nonexistent")
     #getLoc
-    print(us1.getLoc())
-    print(us2.getLoc())
+    print(us1.getLocations())
+    print(us2.getLocations())
     #getKey
     print("User1 key: " + us1.getKey())
     print("User2 key: " + us2.getKey())
@@ -55,10 +55,11 @@ if __name__ == '__main__':
     device
     '''
     #register
-    dev1 = device.register(us1, "id-19", 3) #successful
-    dev2 = device.register(us1, "id-20", 3, "new device") #successful - device with description
+    usLoc = us1.getLocations().pop()
+    dev1 = device.register(usLoc, "id-31", 3) #successful
+    dev2 = device.register(usLoc, "id-32", 3, "new device") #successful - device with description
     try:
-        device.register(us1, "an id", 3) #invalid device id
+        device.register(us1.getLocations().pop(), "an id", 3) #invalid device id
     except:
         print("Invalid device id")
     #getDesc
