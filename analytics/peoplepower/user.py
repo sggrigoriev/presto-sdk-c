@@ -158,6 +158,37 @@ class User(object):
         return responseObj
 
     '''
+    getDeviceById
+    @param deviceId: String
+    @return the user's device with the given ID; returns None if ID does not exist
+    '''
+    def getDeviceById(self, deviceId):
+        # go through all user's locations
+        for location in self.locations:
+            # go through all devices in current location
+            for device in location.getDevices():
+                # if device has the same device ID as given, return
+                if device.getId() == deviceId:
+                    return device
+        return None
+
+    '''
+    getDevicesByProductId
+    @param productId: int
+    @return a list of the user's devices with this product ID
+    '''
+    def getDevicesByProductId(self, productId):
+        devList = []
+        # go through all user's locations
+        for location in self.locations:
+            # go through all devices in current location
+            for device in location.getDevices():
+                # if device has the same product ID as given, add it to list of devices
+                if device.getType() == productId:
+                    devList.append(device)
+        return devList
+
+    '''
     getUsername
     @return this User's location
     '''
@@ -177,7 +208,18 @@ class User(object):
     '''
     def getLocations(self):
         return self.locations
-    
+
+    '''
+    getLocationById
+    @param locationId: int
+    @return user's location with the given id; return None if doesn't exist
+    '''
+    def getLocationById(self, locationId):
+        for location in self.locations:
+            if location.getId() == locationId:
+                return location
+        return None
+
     '''
     getKey
     @return the API Key of this User

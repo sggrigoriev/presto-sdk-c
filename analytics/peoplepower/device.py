@@ -140,28 +140,28 @@ class Device(object):
 
     '''
     getDeviceId
-    returns the ID number of this device
+    @return the ID number of this device
     '''
     def getId(self):
         return self.id
 
     '''
     getType
-    returns the type (product ID) of this device
+    @return the type (product ID) of this device
     '''
     def getType(self):
         return self.type
 
     '''
     getLoc
-    returns the location of this device
+    @return the location of this device
     '''
     def getLoc(self):
         return self.loc
 
     '''
     getDesc
-    returns the description (nickname) of this device
+    @return the description (nickname) of this device
     '''
     def getDesc(self):
         return self.desc
@@ -215,5 +215,3 @@ class Device(object):
     '''
     def getParameters(self):
         return self.parameters
-    
-

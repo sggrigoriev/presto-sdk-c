@@ -142,7 +142,30 @@ class Loc(object):
     '''
     def getDevices(self):
         return self.devices
-    
+
+    '''
+    getDeviceById
+    @param deviceId: String
+    @return: the device at this location with the given deviceId; returns None if it doesn't exist
+    '''
+    def getDeviceById(self, deviceId):
+        for device in self.devices:
+            if(device.getId() == deviceId):
+                return device
+        return None
+
+    '''
+    getDevicesByProductId
+    @param productId: int
+    @return: a list of devices at this location with the given productId
+    '''
+    def getDevicesByProductId(self, productId):
+        devList = []
+        for device in self.devices:
+            if device.getType() == productId:
+                devList.append(device)
+        return devList
+
     '''
     getUser
     @return the user at this Location
@@ -163,16 +186,3 @@ class Loc(object):
     '''
     def getName(self):
         return self.name
-    
-    '''
-    getDeviceById
-    @return the Device if it exists
-    '''
-    def getDeviceById(self, deviceId):
-        for device in self.devices:
-            if(device.getId() == deviceId):
-                return device
-        
-        return None
-    
-
