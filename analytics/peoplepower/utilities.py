@@ -53,6 +53,3 @@ def verifyResponse(responseObj):
     # if action was not successful, throw an error corresponding to result code
     if resultCode != SUCCESS:
         raise ApiError(responseObj["resultCode"], responseObj["resultCodeDesc"], responseObj["resultCodeMessage"])
-
-    
-    

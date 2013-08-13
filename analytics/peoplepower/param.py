@@ -4,13 +4,23 @@ Created on June 25, 2013
 @author: Arun Varma
 '''
 
+class ParamVitals(object):
+    '''
+    __init__
+    @param name: String
+    @param index: int
+    @param value: String or int
+    '''
+    def __init__(self, paramList):
+        self.param = paramList
+
 
 class Param(object):
     '''
     __init__
     defines a Parameter object with a name, index, multiplier, and value
     @param name: String
-    @param index: String (optional - will be set to None if not specified)
+    @param index: String
     @param multiplier: String or enum
     @param value: String or int
     '''

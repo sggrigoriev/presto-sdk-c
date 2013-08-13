@@ -88,7 +88,7 @@ class Loc(object):
         body = None
         header = {strings.API_KEY : self.user.getKey()}
         # sends API Key to endpoint site as http "GET" command, receives response
-        response = utilities.sendAndReceive(strings.GET, endpoint, body, header)
+        response = utilities.sendAndReceive(strings.HTTP_GET, endpoint, body, header)
         responseObj = json.loads(response.decode(strings.DECODER))
         # verifies that Login was successful, reacts accordingly
         utilities.verifyResponse(responseObj)
@@ -108,7 +108,7 @@ class Loc(object):
         body = None
         header = {strings.API_KEY : self.user.getKey()}
         # sends API Key to endpoint site as http "GET" command, receives response
-        response = utilities.sendAndReceive(strings.GET, endpoint, body, header)
+        response = utilities.sendAndReceive(strings.HTTP_GET, endpoint, body, header)
         responseObj = json.loads(response.decode(strings.DECODER))
         # verifies that Login was successful, reacts accordingly
         utilities.verifyResponse(responseObj)

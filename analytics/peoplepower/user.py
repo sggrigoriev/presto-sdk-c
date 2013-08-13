@@ -29,7 +29,7 @@ def createAccount(username, password, appName, email, loc, firstName = None, las
     # specifies JSON as encoding language
     header = {strings.CONTENT_TYPE : strings.JSON_APPLICATION}
     # sends body and header to endpoint site as http "POST" command, receives response
-    response = utilities.sendAndReceive(strings.POST, endpoint, body, header)
+    response = utilities.sendAndReceive(strings.HTTP_POST, endpoint, body, header)
     responseObj = json.loads(response.decode(strings.DECODER))
     # verifies that Create Account was successful, reacts accordingly
     utilities.verifyResponse(responseObj)
@@ -52,7 +52,7 @@ def login(username, password, expiry = None):
         endpoint += strings.EXPIRY + '-1'
     header = {strings.PASSWORD : password}
     # sends username and password to endpoint site as http "POST" command, receives response
-    response = utilities.sendAndReceive(strings.GET, endpoint, None, header)
+    response = utilities.sendAndReceive(strings.HTTP_GET, endpoint, None, header)
     responseObj = json.loads(response.decode(strings.DECODER))
     # verifies that Login was successful, reacts accordingly
     utilities.verifyResponse(responseObj)
@@ -68,7 +68,7 @@ logs user out of server by destroying API Key
 def logout(user):
     endpoint = strings.USER_LOGOUT
     header = {strings.API_KEY : user.getKey()}
-    response = utilities.sendAndReceive(strings.GET, endpoint, None, header)
+    response = utilities.sendAndReceive(strings.HTTP_GET, endpoint, None, header)
     # verifies that Login was successful, reacts accordingly
     utilities.verifyResponse(json.loads(response.decode(strings.DECODER)))
     print('User "' + user.getUsername() + '" logged out')
@@ -128,7 +128,7 @@ class User(object):
         body = None
         header = {strings.API_KEY : self.apiKey}
         # sends API Key to endpoint site as http "GET" command, receives response
-        response = utilities.sendAndReceive(strings.GET, endpoint, body, header)
+        response = utilities.sendAndReceive(strings.HTTP_GET, endpoint, body, header)
         info = json.loads(response.decode(strings.DECODER))
         # verifies that Login was successful, reacts accordingly
         utilities.verifyResponse(info)
@@ -151,7 +151,7 @@ class User(object):
         body = None
         header = {strings.API_KEY : self.apiKey}
         # sends API Key to endpoint site as http "GET" command, receives response
-        response = utilities.sendAndReceive(strings.GET, endpoint, body, header)
+        response = utilities.sendAndReceive(strings.HTTP_GET, endpoint, body, header)
         responseObj = json.loads(response.decode(strings.DECODER))
         # verifies that Login was successful, reacts accordingly
         utilities.verifyResponse(responseObj)

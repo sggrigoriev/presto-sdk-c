@@ -20,6 +20,7 @@ EXPIRY = "&expiry="
 # device
 DEVICES = URL_EXT + "devices/"
 DEVICE_PRODUCT_ID = "?productId="
+DEVICE_PARAMS = "/parameters/"
 # parameters
 PARAMS = URL_EXT + "parameters"
 PARAMS_DEVICE = PARAMS + "?deviceId="
@@ -32,10 +33,10 @@ LOCATION_DEVICES = "/devices/"
 '''
 HTTP Requests
 '''
-GET = "GET"
-POST = "POST"
-PUT = "PUT"
-DELETE = "DELETE"
+HTTP_GET = "GET"
+HTTP_POST = "POST"
+HTTP_PUT = "PUT"
+HTTP_DELETE = "DELETE"
 
 
 '''

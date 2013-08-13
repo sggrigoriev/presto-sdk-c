@@ -16,6 +16,7 @@ parser.add_argument("appId", help="App ID")
 parser.add_argument("--user", help="Presence Username / Email Address")
 parser.add_argument("--password", help="Presence Password")
 parser.add_argument("-v", "--verbose", help="Print more debug information to the console", action="store_true")
+parser.add_argument("-s", "--server", help="developer or esp")
 
 args = parser.parse_args()
 
@@ -27,5 +28,12 @@ except ApiError as error:
 
 if(args.verbose):
     print(user)
+
+appName = args.appId
+try:
+    command_module = __import__("apps.%s.app" % appName, fromlist=["myapp.commands"])
+except ImportError:
+    print("Cannot find or run the given app")
+command_module.run(user)
 
 #print(uuid.uuid4())

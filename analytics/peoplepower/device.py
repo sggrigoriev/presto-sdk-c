@@ -6,6 +6,7 @@ Created on June 25, 2013
 import json
 import peoplepower.utilities as utilities
 import peoplepower.strings as strings
+from peoplepower.param import ParamVitals
 
 '''
 toDevice
@@ -38,7 +39,7 @@ def register(loc, deviceId, productId, desc = None):
     body = None
     header = {strings.API_KEY : loc.getUser().getKey()}
     # sends product ID and API Key to endpoint site as http "POST" command, receives response
-    response = utilities.sendAndReceive(strings.POST, endpoint, body, header)
+    response = utilities.sendAndReceive(strings.HTTP_POST, endpoint, body, header)
     responseObj = json.loads(response.decode(strings.DECODER))
     # verifies that register device was successful, reacts accordingly
     utilities.verifyResponse(responseObj)
@@ -90,11 +91,11 @@ class Device(object):
         body = None
         header = {strings.API_KEY : self.loc.getUser().getKey()}
         # sends device ID and API Key to endpoint site as http "GET" command, receives response
-        response = utilities.sendAndReceive(strings.GET, endpoint, body, header)
+        response = utilities.sendAndReceive(strings.HTTP_GET, endpoint, body, header)
         info = json.loads(response.decode(strings.DECODER))
         # verifies that register device was successful, reacts accordingly
         utilities.verifyResponse(info)
-        
+
         # extract device information and update device properties correspondingly
         devInfo = info["device"]
         self.id = devInfo.get("id", None)
@@ -112,11 +113,10 @@ class Device(object):
         if params != None:
             while params:
                 endpoint += strings.PARAM_NAME + params.pop()
-        print(endpoint)
         header = {strings.API_KEY : self.loc.getUser().getKey()}
         body = None
         # sends device ID and API Key to endpoint site as http "GET" command, receives response
-        response = utilities.sendAndReceive(strings.GET, endpoint, body, header)
+        response = utilities.sendAndReceive(strings.HTTP_GET, endpoint, body, header)
         responseObj = json.loads(response.decode(strings.DECODER))
         # verifies that register device was successful, reacts accordingly
         utilities.verifyResponse(responseObj)
@@ -133,10 +133,55 @@ class Device(object):
         header = {strings.CONTENT_TYPE : strings.JSON_APPLICATION, strings.API_KEY : self.loc.getUser().getKey()}
         body = '{"device": ' + utilities.toJson(forJson) + "}"
         # sends product ID and API Key to endpoint site as http "POST" command, receives response
-        response = utilities.sendAndReceive(strings.PUT, endpoint, body, header)
+        response = utilities.sendAndReceive(strings.HTTP_PUT, endpoint, body, header)
         utilities.verifyResponse(json.loads(response.decode(strings.DECODER)))
         self.desc = nickname
         print("Device description updated: " + nickname)
+
+    '''
+    sendCommand
+    @param name: String
+    @param index: int
+    @param value: String or int
+    @return: 
+    '''
+    def sendCommand(self, name, index, value):
+        param = self.getParameter(name, index)
+        if param != None:
+            dictList = [{"name" : name, "index" : index, "content" : value}]
+            paramObj = ParamVitals(dictList)
+            endpoint = strings.DEVICES + self.id + strings.DEVICE_PARAMS
+            body = '{"parameters":' + utilities.toJson(paramObj) + '}'
+            header = {strings.API_KEY : self.loc.getUser().getKey(), strings.CONTENT_TYPE : strings.JSON_APPLICATION}
+            # sends device ID and API Key to endpoint site as http "GET" command, receives response
+            response = utilities.sendAndReceive(strings.HTTP_PUT, endpoint, body, header)
+            info = json.loads(response.decode(strings.DECODER))
+            # verifies that register device was successful, reacts accordingly
+            utilities.verifyResponse(info)
+            param["value"] = value
+            return self.getParameter(name, index)
+        else:
+            return None
+
+    '''
+    sendCommands
+    @param commandDict: dictionary whose keys are a tuple (name, index) and values are Strings or ints
+    @return: 
+    '''
+    def sendCommands(self, commandDict):
+        paramObj = ParamVitals(commandDict)
+        endpoint = strings.DEVICES + self.id + strings.DEVICE_PARAMS
+        body = '{"parameters":' + utilities.toJson(paramObj) + '}'
+        header = {strings.API_KEY : self.loc.getUser().getKey(), strings.CONTENT_TYPE : strings.JSON_APPLICATION}
+        # sends device ID and API Key to endpoint site as http "GET" command, receives response
+        response = utilities.sendAndReceive(strings.HTTP_PUT, endpoint, body, header)
+        info = json.loads(response.decode(strings.DECODER))
+        # verifies that register device was successful, reacts accordingly
+        utilities.verifyResponse(info)
+        for ((name, index), value) in commandDict:
+            param = self.getParameter(name, index)
+            if param != None:
+                param["value"] = value
 
     '''
     getDeviceId
@@ -181,12 +226,12 @@ class Device(object):
         param = self.getParameter(name, index)
         if(param == None):
             # Add a new parameter
-            param = {'name':name,
-                     'index':index,
-                     'units':units,
-                     'multiplier':multiplier,
-                     'value':value,
-                     'lastUpdateTime':lastUpdateTime}
+            param = {"name" : name,
+                     "index" : index,
+                     "units" : units,
+                     "multiplier" : multiplier,
+                     "value" : value,
+                     "lastUpdateTime" : lastUpdateTime}
             self.parameters.append(param)
             
         else:
@@ -202,11 +247,10 @@ class Device(object):
     getParameter
     Get a Parameter by name and index, None if it doesn't exist
     '''
-    def getParameter(self, name, index):
+    def getParameter(self, name, index = None):
         for param in self.parameters:
             if(param["name"] == name and param["index"] == index):
                 return param
-            
         return None
     
     '''
