@@ -43,7 +43,7 @@ def timerOff(device, minutes):
         now = tz.localize(datetime.datetime.now())
         timeTillOff = (turnOffTime - now).total_seconds()
         print(timeTillOff)
-    
+
         # if device should not turn off yet, wait until then; turn off device
         if timeTillOff >= 0:
             time.sleep(timeTillOff)
@@ -56,14 +56,6 @@ turn device's outletStatus off
 '''
 def turnOffOutletStatus(device):
     device.sendCommand(OUTLET_STATUS, None, OFF)
-
-
-'''
-turnOnOutletStatus
-turn device's outletStatus on
-'''
-def turnOnOutletStatus(device):
-    device.sendCommand(OUTLET_STATUS, None, ON)
 
 
 '''
