@@ -16,6 +16,7 @@ DAYS_MINUTES_FACTOR = 1440
 
 '''
 run
+@param user: User
 turns the user's default devices off automatically after the default time
 '''
 def run(user):
@@ -27,6 +28,8 @@ def run(user):
 
 '''
 timerOff
+@param device: Device
+@param minutes: int
 turns the given device off automatically after the given time
 '''
 def timerOff(device, minutes):
@@ -52,6 +55,7 @@ def timerOff(device, minutes):
 
 '''
 turnOffOutletStatus
+@param device: Device
 turn device's outletStatus off
 '''
 def turnOffOutletStatus(device):
@@ -60,6 +64,7 @@ def turnOffOutletStatus(device):
 
 '''
 switchOutletStatus
+@param device: Device
 if the device's outletStatus is off, turn it on; else, turn it off
 @return device's outletStatus
 '''
@@ -73,6 +78,7 @@ def switchOutletStatus(device):
 
 '''
 isOn
+@param device: Device
 @return true if the device's outletStatus is on; false otherwise
 '''
 def isOn(device):
@@ -80,6 +86,7 @@ def isOn(device):
 
 '''
 isoToDate
+@param iso: String
 converts an ISO DateTime to a Python DateTime
 '''
 def isoToDate(iso):

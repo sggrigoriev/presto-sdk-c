@@ -11,6 +11,7 @@ DEFAULT_PRODUCT_ID = 2012
 
 '''
 run
+@param user: User
 turns all the user's default devices off
 '''
 def run(user):
@@ -22,6 +23,7 @@ def run(user):
 
 '''
 turnOffOutletStatus
+@param device: Device
 turn device's outletStatus off
 '''
 def turnOffOutletStatus(device):
