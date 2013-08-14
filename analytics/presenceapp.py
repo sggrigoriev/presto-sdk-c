@@ -29,9 +29,8 @@ except ApiError as error:
 if(args.verbose):
     print(user)
 
-appName = args.appId
 try:
-    command_module = __import__("apps.%s.app" % appName, fromlist=["myapp.commands"])
+    command_module = __import__("apps.%s.app" % args.appId, fromlist=["apps"])
 except ImportError:
     print("Cannot find or run the given app")
 command_module.run(user)
