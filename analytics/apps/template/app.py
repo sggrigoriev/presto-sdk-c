@@ -2,7 +2,7 @@
 Created on Aug 7, 2013
 @author: Arun Varma
 '''
-import datetime, pytz, dateutil.parser as dateutil, time
+import datetime, pytz, time, dateutil.parser as dateutil
 
 
 ON = "ON"

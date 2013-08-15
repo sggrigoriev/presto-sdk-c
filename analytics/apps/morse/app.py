@@ -10,10 +10,11 @@ OFF = "OFF"
 OUTLET_STATUS = "outletStatus"
 DOT = "."
 DASH = "-"
-SHORT = 1
-LONG = 3
+PAUSE = " "
+SHORT = 0.5
+LONG = 2
 DEFAULT_PRODUCT_ID = 2012
-DEFAULT_MESSAGE = "Hello World"
+DEFAULT_MESSAGE = "SOS"
 morseCode = {
         'A': '.-',              'a': '.-',
         'B': '-...',            'b': '-...',
@@ -63,8 +64,13 @@ turns the user's default devices off automatically after the default time
 def run(user):
     # timerOff all devices with the default product id
     devices = user.getDevicesByProductId(DEFAULT_PRODUCT_ID)
+    raw_input = input("Enter a message: ")
+    if raw_input == "":
+        toTranslate = DEFAULT_MESSAGE
+    else:
+        toTranslate = raw_input
     for device in devices:
-        morseFunction(device, DEFAULT_MESSAGE)
+        morseFunction(device, toTranslate)
 
 
 '''
@@ -79,6 +85,7 @@ def morseFunction(device, message):
 
     # convert message to morse code
     morse = toMorse(message)
+    print(message + ": " + morse)
     # for each character, 
     for character in morse:
         morseSwitch(device, character)
@@ -98,6 +105,8 @@ def morseSwitch(device, character):
         turnOnOutletStatus(device)
         time.sleep(LONG)
         turnOffOutletStatus(device)
+    elif character == PAUSE:
+        time.sleep(SHORT)
 
 
 '''
@@ -125,5 +134,8 @@ toMorse
 def toMorse(message):
     morse = ""
     for character in message:
-        morse += morseCode[character]
+        try:
+            morse += morseCode[character]
+        except:
+            print("Character " + character + " is not supported by morse code")
     return morse
