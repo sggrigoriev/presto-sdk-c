@@ -30,6 +30,7 @@ registers this device with the cloud
 @param deviceId: String (case sensitive, without spaces)
 @param productId: int 
 @param desc: String
+@return the registered Device
 '''
 def register(loc, deviceId, productId, desc = None):
     for ch in deviceId:
