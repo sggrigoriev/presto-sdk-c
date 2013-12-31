@@ -1,6 +1,6 @@
-Presence Platform SDK
+IOEPlatform SDK
 ===========
 
-Presence Platform SDK for connected homes and buildings
+Internet of Everything Platform SDK for connected homes and buildings
 
 <a href="http://developer.peoplepowerco.com/">developer.peoplepowerco.com</a> documentation site.
