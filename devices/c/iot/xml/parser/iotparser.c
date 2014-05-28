@@ -133,7 +133,7 @@ static void _iotparser_xml_startElementHandler(void *ctx, const xmlChar *name, c
         strncpy(command->deviceId, value, EUI64_STRING_SIZE);
 
       } else if(strcmp(attr, IOTPARSER_ATTR_INDEX) == 0) {
-        command->asciiIndex = *((char *) value);
+        command->asciiIndex = atoi(value) + '0';
 
       } else if(strcmp(attr, IOTPARSER_ATTR_COMMANDTYPE) == 0) {
         strncpy(command->commandType, value, IOT_COMMAND_TYPE_STRING_SIZE);

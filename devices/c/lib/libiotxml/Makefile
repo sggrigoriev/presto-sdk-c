@@ -45,7 +45,7 @@ LINK_FLAG = -shared -o $(RESULT_DIR)/$(LIB_NAME).so $(OBJECTS)
 
 OBJECTS=$(SOURCES:.c=.o)
 LDEXTRA+=$(PPCLIBPATH) $(LIBRT) $(LIBXML2) $(LIBCURL) -lpthread
-LOCALINCLUDEPATH =
+LOCALINCLUDEPATH = -I../../apps/proxyserver/
 
 all: dynlib staticlib
 
