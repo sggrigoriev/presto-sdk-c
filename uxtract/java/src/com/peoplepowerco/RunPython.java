@@ -24,7 +24,7 @@ public class RunPython {
 		// Avoid passing in too much information into untrusted scripts
 		// Erase System Properties
 		Properties props = new Properties();
-		props.setProperty("python.path", "/Users/ppc/workspace/ioeplatform/uxtract/java/");
+		//props.setProperty("python.path", "example/path");
 		PythonInterpreter.initialize(null, props, argv);
 		
 		// Execute the python script
