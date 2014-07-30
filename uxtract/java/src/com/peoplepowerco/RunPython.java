@@ -3,6 +3,8 @@
  */
 package com.peoplepowerco;
 
+import java.util.Properties;
+
 import org.python.util.PythonInterpreter; 
 
 /**
@@ -20,13 +22,20 @@ public class RunPython {
 		String argv[] = { "Hello", "from", "python" };
 		
 		// Avoid passing in too much information into untrusted scripts
-		// Erase Properties
-		PythonInterpreter.initialize(null, null, argv);
+		// Erase System Properties
+		Properties props = new Properties();
+		props.setProperty("python.path", "/Users/ppc/workspace/ioeplatform/uxtract/java/");
+		PythonInterpreter.initialize(null, props, argv);
 		
 		// Execute the python script
-		PythonInterpreter py = new PythonInterpreter();
-		py.execfile("pythonTest.py");
-		
+		try {
+			PythonInterpreter py = new PythonInterpreter();
+			py.execfile("pythonTest.py");
+			
+		} catch (org.python.core.PyException e) {
+			throw e;
+		}
+
 	}
 
 }
