@@ -129,7 +129,7 @@ int iotxml_addString(char *dest, int maxSize, const char *deviceId, int deviceTy
   // Give it an index # if a valid ASCII paramIndex was given
   if(asciiParamIndex >= '0') {
     offset += snprintf(dest + offset, maxSize - offset,
-        " index=\"%c\"", asciiParamIndex);
+        " index=\"%d\"", asciiParamIndex-'0');
   }
 
   if(multiplier != NULL) {

@@ -36,6 +36,7 @@
 #include "ioterror.h"
 #include "iotdebug.h"
 #include "eui64.h"
+#include "proxyserver.h"
 
 /**
  * Obtain the 48-bit MAC dest and convert to an EUI-64 value from the
@@ -88,12 +89,12 @@ error_t eui64_toBytes(uint8_t *dest, int destLen) {
   close(sock);
   if (ok) {
     /* Convert 48 bit MAC dest to EUI-64 */
-    memcpy(dest, ifr->ifr_hwaddr.sa_data, 3);
+    memcpy(dest, ifr->ifr_hwaddr.sa_data, 6);
     /* Insert the converting bits in the middle */
-    dest[3] = 0xFF;
+    /* dest[3] = 0xFF;
     dest[4] = 0xFE;
     memcpy(&dest[5], &(ifr->ifr_hwaddr.sa_data[3]), 3);
-
+    */
   } else {
     SYSLOG_ERR("Couldn't read MAC dest to seed EUI64");
     return FAIL;
@@ -107,7 +108,9 @@ error_t eui64_toBytes(uint8_t *dest, int destLen) {
  * @return SUCCESS if we are able to capture the EUI64
  */
 error_t eui64_toString(char *dest, int destLen) {
-  uint8_t byteAddress[EUI64_BYTES_SIZE];
+  uint8_t byteAddress[EUI64_BYTES_SIZE], i;
+  uint16_t checksum= 0;
+  char deviceType[DEVICE_TYPE_SIZE];
 
   assert(dest);
 
@@ -115,13 +118,63 @@ error_t eui64_toString(char *dest, int destLen) {
     return FAIL;
   }
 
+  /* new format: ${MAC_ADDRESS}-${PRODUCT_ID}-${CHECKSUM} */
   if (eui64_toBytes(byteAddress, sizeof(byteAddress)) == SUCCESS) {
-    snprintf(dest, destLen, "%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X",
+    memset(deviceType, 0x0, DEVICE_TYPE_SIZE);
+    readDeviceType(deviceType);
+
+    memset(dest, 0x0, destLen);
+    snprintf(dest, destLen, "%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X-%s-",
         byteAddress[0], byteAddress[1], byteAddress[2], byteAddress[3],
-        byteAddress[4], byteAddress[5], byteAddress[6], byteAddress[7]);
+        byteAddress[4], byteAddress[5], deviceType);
+
+    for(i = 0; i < strlen(dest) ; i++ ) {
+        checksum+= dest[i];
+    }
+    snprintf(dest, destLen, "%s%X", dest, checksum);
 
     return SUCCESS;
   }
 
   return FAIL;
+}
+
+/**
+ * Read deviceType via proxyserver.h
+ * 
+ * @return deviceType if can get via proxy.conf or 
+ */
+error_t readDeviceType(char *deviceType)
+{
+/**
+ * #define DEFAULT_PROXY_DEVICETYPE "4"
+ * #define DEFAULT_PROXY_CONFIG_FILENAME "/opt/etc/proxy.conf"
+ * #define CONFIGIO_PROXY_DEVICE_TYPE_TOKEN_NAME "PROXY_DEVICE_TYPE"
+ */
+#if defined(DEFAULT_PROXY_CONFIG_FILENAME) && defined(CONFIGIO_PROXY_DEVICE_TYPE_TOKEN_NAME)
+  FILE *fp= fopen(DEFAULT_PROXY_CONFIG_FILENAME,"r");
+  char line[1024];
+  
+  if ( fp!= NULL ) {
+    while(fgets(line, sizeof(line), fp)) {
+      if ( !strncmp(line,CONFIGIO_PROXY_DEVICE_TYPE_TOKEN_NAME,strlen(CONFIGIO_PROXY_DEVICE_TYPE_TOKEN_NAME)) ) {
+	line[strlen(line)-1]= 0;
+	snprintf(deviceType, DEVICE_TYPE_SIZE, "%s", line+strlen(CONFIGIO_PROXY_DEVICE_TYPE_TOKEN_NAME)+1);
+        break;
+      }
+    }
+    fclose(fp);
+  }
+#endif
+  
+  if ( deviceType[0]==0x0 ) {
+#ifdef DEFAULT_PROXY_DEVICETYPE
+    snprintf(deviceType, DEVICE_TYPE_SIZE, "%s", DEFAULT_PROXY_DEVICETYPE);
+#else
+    deviceType[0]= '0';
+    return FAIL;
+#endif
+  }
+
+  return SUCCESS;
 }

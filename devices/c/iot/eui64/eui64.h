@@ -43,12 +43,16 @@
 #endif
 
 #ifndef EUI64_STRING_SIZE
-#define EUI64_STRING_SIZE 17 // 16 characters + 1 null-terminated character
+#define EUI64_STRING_SIZE 27 // store for new device ID ${MAC_ADDRESS}-${PRODUCT_ID}-${CHECKSUM} = 12+1+8+1+4
 #endif
+
+#define DEVICE_TYPE_SIZE 8
 
 /***************** Public Prototypes ****************/
 error_t eui64_toBytes(uint8_t *dest, int destLen);
 
 error_t eui64_toString(char *dest, int destLen);
+
+error_t readDeviceType(char *deviceType);
 
 #endif
