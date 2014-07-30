@@ -59,3 +59,23 @@ IOEplatform Command Center
 Of course, no Internet of Everything platform would be complete without a way to manage the user base. That's why the IOEplatform provides the Command Center, a web-enabled user management system with plug-in modules to customize its functionality. The Command Center supports the Tier-1 Technical Support Module to find and fix problems, the Device Management Module to manage accounts like a property manager, the Engagement Module to engage communities and influence large-scale behavior change, and the Enterprise Module to manage hundreds of devices simultaneously across a building or campus. 
 
 
+License
+-------
+/*
+ *  Copyright 2014 People Power Company
+ *  
+ *  This code was developed with funding from People Power Company
+ *  
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
