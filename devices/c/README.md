@@ -1,4 +1,5 @@
 This is a C-implementation of the Internet of Things SDK.
+========================================================
 
 It includes several directories:
 > apps : Standalone applications that you can use for reference source code
@@ -23,7 +24,7 @@ used in application Makefiles within this open source repository as well.
 
 
 Here's how it works...
-
+----------------------
 PROXY
 The iot/proxy directory is one of the main components of this SDK. It 
 implements a persistent HTTP connection with a cloud server which allows 
