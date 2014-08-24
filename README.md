@@ -8,19 +8,20 @@ for embedded hubs, gateways, WiFi routers, set-top boxes, and embedded end-devic
 that are running Linux.
 
 It includes several directories:
-> apps : Standalone applications that you can use for reference source code
-to build and use your own agents.
+* /apps
+> Standalone applications that you can use for reference source code to build and use your own agents.
 
-> include : Global headers. Library headers are automatically copied in when
-you build the lib directory.
+* /include
+> Global headers. Library headers are automatically copied in when you build the lib directory.
 
-> iot : IOT stands for "Internet of Things". This directory contains tools
-your applications need to connect to the Internet and communicate.
+* /iot
+> IOT stands for "Internet of Things". This directory contains tools your applications need to connect to the Internet and communicate.
 
-> lib : Libraries. Make this directory and copy or symlink the .so's into 
-/usr/lib.  You may need to make the 3rd party libraries individually.
+* /lib
+> Libraries. Make this directory and copy or symlink the .so's into /usr/lib.  You may need to make the 3rd party libraries individually.
 
-> support : Support files for the compile toolchain
+* /support
+> Support files for the compile toolchain
 
 The $IOTSDK environment variable can define where your iotsdk directory is
 located. This environment variable may be used in your own applications'
@@ -59,23 +60,23 @@ below.
 The proxy.h file provides these functions:
 
 * error_t proxy_start(const char *url);
-    Start the proxy, opens a persistent connection with the server
+    > Start the proxy, opens a persistent connection with the server
 
 * void proxy_stop();
-    Stop the proxy
+    > Stop the proxy
 
 * error_t proxy_addListener(proxylistener l);
-    Add a listener for commands
+    > Add a listener for commands
 
 * error_t proxy_removeListener(proxylistener l);
-    Remove a listener for commands
+    > Remove a listener for commands
 
 * error_t proxy_send(const char *data, int len);
-    Send a measurement. Use the iotapi.h to form XML to pass in.
+    > Send a measurement. Use the iotapi.h to form XML to pass in.
 
 
-PROXYSERVER APPLICATION FOR HUBS, GATEWAYS, ROUTERS, SET-TOP BOXES 
---------------------------------------------------------------------
+PROXYSERVER APPLICATION
+-----------------------
 You'll use a Proxy server application on hubs, gateways, routers, and set-top boxes.
 It manages a single pipe to the server and pumps all the other device's
 data through that pipe, meaning your products are more scalable.
@@ -90,8 +91,8 @@ where the <key> is given to you by People Power Company to bind your
 physical device with your username.
 
 
-SENDING XML MEASUREMENTS
-------------------------
+SENDING AND RECEIVING XML
+--------------------------------------
 The iot/xml directory contains an important file:  iotapi.h.
 
 This header defines function prototypes you would use to create XML
@@ -106,57 +107,60 @@ When you send a message from here, the library triggers an event at your
 application so you can decide how you want the message delivered --
 either directly to the proxy, or through a connection to a proxyserver socket.
 * error_t application_send(const char *msg, int len);
-    You are responsible for implementing this function to direct traffic
+    > You are responsible for implementing this function in your application to direct traffic
     to the correct proxy.
 
+* void application_receive(const char *msg, int len);
+    > You are responsible for implementing this function in your application to receive traffic
+    from the correct proxy.
 
+iotapi.h functions
+-------------------
 * int iotxml_newMsg(char *destMsg, int maxSize);
-    Create a new message to hold some measurements
+    > Create a new message to hold some measurements
 
 * error_t iotxml_addDevice(const char *deviceId, int deviceType);
-    Start adding measurements for a new device
+    > Start adding measurements for a new device
 
 * error_t iotxml_alertDeviceIsGone(const char *deviceId);
-    Alert that this device is no longer seen in the local network
+    > Alert that this device is no longer seen in the local network
 
 * int iotxml_addString(char *dest, int maxSize, const char *deviceId, int deviceType, param_type_e paramType, const char *paramName, const char *multiplier, char asciiParamIndex, const char *paramValue);
-    Add a string measurement
+    > Add a string measurement
 
 * int iotxml_addInt(char *dest, int maxSize, const char *deviceId, int deviceType, param_type_e paramType, const char *paramName, const char *multiplier, char asciiParamIndex, int paramValue);
-    Add an integer measurement
+    > Add an integer measurement
 
 * error_t iotxml_send(char *destMsg, int maxSize);
-    Send the message
+    > Send the message
 
 * void iotxml_abortMsg();
-    Abort any messages that are sending
+    > Abort any messages that are sending
 
 * error_t iotxml_sendResult(int commandId, result_code_e result);
-    Send a result back to the server after executing a command
-    Each command you receive needs to send back a result
+    > Send a result back to the server after executing a command. Each command you receive needs to send back a result.
 
 * error_t iotxml_parse(const char *xml, int len);
-    Parse some XML that was received - this will automatically
-    trigger command listeners
+    > Parse some XML that was received - this will automatically trigger command listeners
 
 * error_t iotxml_addCommandListener(commandlistener_f l, char *type);
-    Add a listener for commands of a certain type
+    > Add a listener for commands of a certain type
 
 * error_t iotxml_removeCommandListener(commandlistener_f l);
-    Remove a command listener
+    > Remove a command listener
 
 * error_t iotxml_pushMeasurementNow(const char *deviceId);
-    Force the proxy to push its measurements to the server without buffering
+    > Force the proxy to push its measurements to the server without buffering
 
 
 
 EXAMPLE APPLICATIONS
 ---------------------
-The apps/exampleagent is a template for an agent that would connect to the
+The *apps/exampleagent* is a template for an agent that would connect to the
 proxyserver's socket and manage a set of similar devices.  It actually
 does not function, but it compiles. 
 
-The apps/rtoaagent is a fully working example application that connects
+The *apps/rtoaagent* is a fully working example application that connects
 Radio Thermostat of America thermostats to the IOEplatform.  Full source
 code is available. We show how to discover, measure, control, and 
 synchronize the time on many RTOA thermostats on the local network from
