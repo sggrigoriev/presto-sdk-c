@@ -1,4 +1,4 @@
-IOEPlatform SDK in C
+IOEplatform SDK in C
 =====================
 
 Internet of Everything Platform SDK for connected homes and buildings
