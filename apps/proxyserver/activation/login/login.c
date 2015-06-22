@@ -66,8 +66,11 @@ error_t login_doLogin(const char *username, const char *password) {
   char baseUrl[PATH_MAX];
   char url[PATH_MAX];
   char rxBuffer[PROXY_MAX_MSG_LEN];
+  char headerPassword[PROXY_HEADER_PASSWORD_LEN];
   http_param_t params;
   login_info_t loginInfo;
+
+  bzero(&params, sizeof(params));
 
   xmlSAXHandler saxHandler = {
       NULL, // internalSubsetHandler,
@@ -103,7 +106,8 @@ error_t login_doLogin(const char *username, const char *password) {
     strncpy(baseUrl, DEFAULT_ACTIVATION_URL, sizeof(baseUrl));
   }
 
-  snprintf(url, sizeof(url), "%s/login/%s/%s/14", baseUrl, username, password);
+  snprintf(url, sizeof(url), "%s/login?username=%s", baseUrl, username);
+  snprintf(headerPassword, sizeof(headerPassword), "PASSWORD: %s", password);
 
   SYSLOG_INFO("Logging in...");
   SYSLOG_INFO("Contacting URL %s\n", url);
@@ -111,23 +115,31 @@ error_t login_doLogin(const char *username, const char *password) {
   params.verbose = TRUE;
   params.timeouts.connectTimeout = HTTPCOMM_DEFAULT_CONNECT_TIMEOUT_SEC;
   params.timeouts.transferTimeout = HTTPCOMM_DEFAULT_TRANSFER_TIMEOUT_SEC;
+  params.password = headerPassword;
 
   libhttpcomm_sendMsg(NULL, CURLOPT_HTTPGET, url, NULL, NULL, NULL, 0, rxBuffer, sizeof(rxBuffer), params, NULL);
 
   SYSLOG_INFO("Server returned: \n%s\n", rxBuffer);
 
   loginInfo.resultCode = -1;
-  xmlSAXUserParseMemory(&saxHandler, &loginInfo, rxBuffer, strlen(rxBuffer));
 
-  if(loginInfo.resultCode == 0) {
-    printf("Login successful!\n");
-    SYSLOG_INFO("Login successful");
-    return SUCCESS;
+  if ( 0 == xmlSAXUserParseMemory(&saxHandler, &loginInfo, rxBuffer, strlen(rxBuffer)) )
+  {
 
-  } else {
-    printf("Error logging in\n");
-    return FAIL;
+      if(loginInfo.resultCode == 0) {
+	  printf("Login successful!\n");
+	  SYSLOG_INFO("Login successful");
+	  return SUCCESS;
+
+      } else {
+	  printf("Error logging in\n");
+	  return FAIL;
+      }
   }
+
+
+  printf("Error logging in\n");
+  return FAIL;
 }
 
 

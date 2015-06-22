@@ -46,6 +46,7 @@
 #include "iotdebug.h"
 #include "proxycli.h"
 #include "proxy.h"
+#include "../login/login.h"
 
 
 
@@ -74,6 +75,7 @@ char *getactivationinfo_getDeviceActivationKey(const char *key, int locationId) 
   char baseUrl[PATH_MAX];
   char deviceType[8];
   char rxBuffer[PROXY_MAX_MSG_LEN];
+  char headerApiKey[PROXY_HEADER_KEY_LEN];
   http_param_t params;
   getactivationinfo_info_t getActivationInfo;
 
@@ -110,6 +112,8 @@ char *getactivationinfo_getDeviceActivationKey(const char *key, int locationId) 
 
 
   bzero(deviceType, sizeof(deviceType));
+  bzero(&params, sizeof(params));
+  snprintf(headerApiKey, sizeof(headerApiKey), "FABRUX_API_KEY: %s", login_getApiKey());
 
   // Read the device type from the configuration file
   if(libconfigio_read(proxycli_getConfigFilename(), CONFIGIO_PROXY_DEVICE_TYPE_TOKEN_NAME, deviceType, sizeof(deviceType)) == -1) {
@@ -125,7 +129,8 @@ char *getactivationinfo_getDeviceActivationKey(const char *key, int locationId) 
     strncpy(baseUrl, DEFAULT_ACTIVATION_URL, sizeof(baseUrl));
   }
 
-  snprintf(url, sizeof(url), "%s/deviceActivationInfo/%s/%d/%s?sendEmail=false", baseUrl, key, locationId, deviceType);
+  //snprintf(url, sizeof(url), "%s/deviceActivationInfo/%s/%d/%s?sendEmail=false", baseUrl, key, locationId, deviceType);
+  snprintf(url, sizeof(url), "%s/locations/%d/deviceActivation/%s", baseUrl, locationId, deviceType);
 
   SYSLOG_INFO("Getting device activation key...");
   SYSLOG_INFO("Contacting URL %s\n", url);
@@ -133,6 +138,7 @@ char *getactivationinfo_getDeviceActivationKey(const char *key, int locationId) 
   params.verbose = TRUE;
   params.timeouts.connectTimeout = HTTPCOMM_DEFAULT_CONNECT_TIMEOUT_SEC;
   params.timeouts.transferTimeout = HTTPCOMM_DEFAULT_TRANSFER_TIMEOUT_SEC;
+  params.key = headerApiKey;
 
   libhttpcomm_sendMsg(NULL, CURLOPT_HTTPGET, url, NULL, NULL, NULL, 0, rxBuffer, sizeof(rxBuffer), params, NULL);
 

@@ -52,6 +52,8 @@ typedef struct http_timeout_t {
 typedef struct http_param_t {
   http_timeout_t timeouts;
   bool verbose;
+  char *password;
+  char *key;
 } http_param_t;
 
 

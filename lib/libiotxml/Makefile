@@ -41,7 +41,7 @@ STATLIB_EXTENSION = a
 # Link Flag
 #LINK_FLAG = -L$(RESULT_DIR) -shared -Wl,-soname,$(LIB_NAME).$(DYNLIB_EXTENSION) -lc -lm -lpthread
 
-LINK_FLAG = -shared -o $(RESULT_DIR)/$(LIB_NAME).so $(OBJECTS)
+LINK_FLAG += -shared -o $(RESULT_DIR)/$(LIB_NAME).so $(OBJECTS)
 
 OBJECTS=$(SOURCES:.c=.o)
 LDEXTRA+=$(PPCLIBPATH) $(LIBRT) $(LIBXML2) $(LIBCURL) -lpthread
@@ -53,10 +53,10 @@ clean:
 	$(RM) -rf ./*.o ./*.d ./*.dll ./*.a ../*.a ./*.so ../*.so ../../include/iotapi.h ../../include/eui64.h ../../include/timestamp.h $(LIB_NAME)
 	
 $(LIB_NAME): $(OBJECTS)
-	@$(CC) $(PPCINCLUDEPATH) $(LOCALINCLUDEPATH) $(LDFLAGS) -o $@ $(OBJECTS) $(LDEXTRA)
+	$(CC) $(PPCINCLUDEPATH) $(LOCALINCLUDEPATH) $(LDFLAGS) -o $@ $(OBJECTS) $(LDEXTRA)
 
 .c.o:
-	@$(CC) $(PPCINCLUDEPATH) $(LOCALINCLUDEPATH) $(CFLAGS) -c -o $@ $< 
+	$(CC) $(PPCINCLUDEPATH) $(LOCALINCLUDEPATH) $(CFLAGS) -c -o $@ $< 
 	
 staticlib: $(OBJECTS)
 	@$(AR) $(ARFLAG) $(RESULT_DIR)/$(LIB_NAME).$(STATLIB_EXTENSION) ${OBJECTS}
@@ -67,7 +67,7 @@ staticlib: $(OBJECTS)
 	@cp ../../iot/utils/timestamp.h ../../include/.
 	
 dynlib: $(OBJECTS)
-	@$(CC) $(LINK_FLAG) $(LDEXTRA)
+	$(CC) $(LINK_FLAG) $(LDEXTRA)
 	@cp ./$(LIB_NAME).so ../
 	@mkdir -p ../../include
 	@cp ../../iot/xml/iotapi.h ../../include/.

@@ -41,7 +41,8 @@ else
 	AR = ar
 	STRIP=strip
 	INTEL = 0
-	CFLAGS+=-g3
+	CFLAGS+=-g3 -fPIC
+	LINK_FLAG=-fPIC
 	export HARDWARE_PLATFORM = INTEL
 endif
 

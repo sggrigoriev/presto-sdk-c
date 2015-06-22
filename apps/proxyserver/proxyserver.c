@@ -106,8 +106,8 @@ int main(int argc, char *argv[]) {
 
       }
 
-      printf("Activation failed. Exiting.\n\n");
-      SYSLOG_ERR("Activation failed. Exiting.\n\n");
+      printf("Activation failed. Exiting. (proxycli_getActivationKey)\n\n");
+      SYSLOG_ERR("Activation failed. Exiting. (proxycli_getActivationKey)\n\n");
       exit(1);
 
     } else {
@@ -120,8 +120,8 @@ int main(int argc, char *argv[]) {
         }
       }
 
-      printf("Activation failed. Exiting.\n\n");
-      SYSLOG_ERR("Activation failed. Exiting.\n\n");
+      printf("Activation failed. Exiting. (login_doLogin) \n\n");
+      SYSLOG_ERR("Activation failed. Exiting. (login_doLogin)\n\n");
       exit(1);
     }
   }

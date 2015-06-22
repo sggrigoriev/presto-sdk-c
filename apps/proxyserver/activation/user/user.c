@@ -44,6 +44,7 @@
 #include "proxycli.h"
 #include "proxy.h"
 #include "user.h"
+#include "../login/login.h"
 
 
 /** API key */
@@ -64,6 +65,7 @@ int user_getLocationId(const char *key) {
   char baseUrl[PATH_MAX];
   char url[PATH_MAX];
   char rxBuffer[PROXY_MAX_MSG_LEN];
+  char headerApiKey[PROXY_HEADER_KEY_LEN];
   http_param_t params;
 
   xmlSAXHandler saxHandler = {
@@ -97,6 +99,9 @@ int user_getLocationId(const char *key) {
     return locationId;
   }
 
+  bzero(&params, sizeof(params));
+  snprintf(headerApiKey, sizeof(headerApiKey), "FABRUX_API_KEY: %s", login_getApiKey());
+
   // Read the activation URL from the configuration file
   if(libconfigio_read(proxycli_getConfigFilename(), CONFIGIO_ACTIVATION_URL_TOKEN_NAME, baseUrl, sizeof(baseUrl)) == -1) {
     printf("Couldn't read %s in file %s, writing default value\n", CONFIGIO_ACTIVATION_URL_TOKEN_NAME, proxycli_getConfigFilename());
@@ -104,7 +109,7 @@ int user_getLocationId(const char *key) {
     strncpy(baseUrl, DEFAULT_ACTIVATION_URL, sizeof(baseUrl));
   }
 
-  snprintf(url, sizeof(url), "%s/user/%s", baseUrl, key);
+  snprintf(url, sizeof(url), "%s/user", baseUrl);
 
   SYSLOG_INFO("Obtaining location ID...");
   SYSLOG_INFO("Contacting URL %s\n", url);
@@ -112,6 +117,7 @@ int user_getLocationId(const char *key) {
   params.verbose = TRUE;
   params.timeouts.connectTimeout = HTTPCOMM_DEFAULT_CONNECT_TIMEOUT_SEC;
   params.timeouts.transferTimeout = HTTPCOMM_DEFAULT_TRANSFER_TIMEOUT_SEC;
+  params.key = headerApiKey;
 
   libhttpcomm_sendMsg(NULL, CURLOPT_HTTPGET, url, NULL, NULL, NULL, 0, rxBuffer, sizeof(rxBuffer), params, NULL);
 

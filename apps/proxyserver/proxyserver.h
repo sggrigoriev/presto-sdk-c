@@ -28,7 +28,7 @@
 #endif
 
 #ifndef DEFAULT_ACTIVATION_URL
-#define DEFAULT_ACTIVATION_URL "developer.peoplepowerco.com/espapi/rest"
+#define DEFAULT_ACTIVATION_URL "developer.peoplepowerco.com/cloud/xml"
 #endif
 
 #ifndef DEFAULT_PROXY_DEVICETYPE

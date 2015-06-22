@@ -271,9 +271,25 @@ int libhttpcomm_sendMsg(CURLSH * shareCurlHandle, CURLoption httpMethod, const c
     curlHandle = curl_easy_init();
     if (curlHandle)
     {
-        slist = curl_slist_append(slist, "Content-Type: text/xml");
-        snprintf(tempString, sizeof(tempString), "Content-Length: %d", msgToSendSize);
-        slist = curl_slist_append(slist, tempString);
+	if ( httpMethod == CURLOPT_POST )
+	{
+	    slist = curl_slist_append(slist, "Content-Type: text/xml");
+	    snprintf(tempString, sizeof(tempString), "Content-Length: %d", msgToSendSize);
+	    slist = curl_slist_append(slist, tempString);
+	}
+	else if ( httpMethod  == CURLOPT_HTTPGET )
+	{
+	    if ( params.password != NULL )
+	    {
+		SYSLOG_ERR("password: %s", params.password);
+		slist = curl_slist_append(slist, params.password);
+	    }
+	    if ( params.key != NULL )
+	    {
+		SYSLOG_ERR("key: %s", params.key);
+		slist = curl_slist_append(slist, params.key);
+	    }
+	}
 
         if (_libhttpcomm_configureHttp(curlHandle, shareCurlHandle, slist, httpMethod, url,
                 sslCertPath, authToken, params.timeouts, ProgressCallback) == false)
