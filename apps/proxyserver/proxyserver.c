@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) {
   socklen_t clientLen;
   struct sockaddr_in serverAddress;
   struct sockaddr_in clientAddress;
-  char eui64[EUI64_STRING_SIZE];
+  char eui64[EUI64_STRING_SIZE+8];
 
   // Ignore the SIGCHLD signal to get rid of zombies
   signal(SIGCHLD, SIG_IGN);
