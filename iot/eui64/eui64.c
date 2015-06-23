@@ -72,18 +72,18 @@ error_t eui64_toBytes(uint8_t *dest, int destLen) {
 
   ifr = ifc.ifc_req;
   for (i = 0; i < ifc.ifc_len / sizeof(struct ifreq); ifr++) {
-    if (strcmp(ifr->ifr_name, "eth0") == 0 || strcmp(ifr->ifr_name, "eth1")
-        == 0 || strcmp(ifr->ifr_name, "wlan0") == 0 || strcmp(ifr->ifr_name,
-        "br0") == 0) {
-      if (ioctl(sock, SIOCGIFFLAGS, ifr) == 0) {
-        if (!(ifr->ifr_flags & IFF_LOOPBACK)) {
-          if (ioctl(sock, SIOCGIFHWADDR, ifr) == 0) {
-            ok = 1;
-            break;
-          }
-        }
+      if (strcmp(ifr->ifr_name, "eth0") == 0 || strcmp(ifr->ifr_name, "eth1")
+	      == 0 || strcmp(ifr->ifr_name, "wlan0") == 0 || strcmp(ifr->ifr_name,
+		  "br0") == 0) {
+	  if (ioctl(sock, SIOCGIFFLAGS, ifr) == 0) {
+	      if (!(ifr->ifr_flags & IFF_LOOPBACK)) {
+		  if (ioctl(sock, SIOCGIFHWADDR, ifr) == 0) {
+		      ok = 1;
+		      break;
+		  }
+	      }
+	  }
       }
-    }
   }
 
   close(sock);
@@ -111,6 +111,7 @@ error_t eui64_toString(char *dest, int destLen) {
   uint8_t byteAddress[EUI64_BYTES_SIZE], i;
   uint16_t checksum= 0;
   char deviceType[DEVICE_TYPE_SIZE];
+  char *tmp = NULL;
 
   assert(dest);
 
@@ -131,7 +132,15 @@ error_t eui64_toString(char *dest, int destLen) {
     for(i = 0; i < strlen(dest) ; i++ ) {
         checksum+= dest[i];
     }
-    snprintf(dest, destLen, "%s%X", dest, checksum);
+
+    tmp = strdup(dest);
+
+    if ( tmp != NULL )
+    {
+	snprintf(dest, destLen, "%s%X", tmp, checksum);
+	free(tmp);
+    }
+
 
     return SUCCESS;
   }
