@@ -54,8 +54,10 @@ char *_proxymanager_getProxySslCertificateFromConfigFile(char *buffer, int maxsi
 void proxymanager_startProxy() {
   char buffer[PROXY_URL_SIZE];
 
+#ifdef PROXY_ACTIVATION
   // Pull the activation key from the config file
   proxyconfig_setActivationToken(_proxymanager_getProxyActivationKeyFromConfigFile(buffer, sizeof(buffer)));
+#endif
 
   // Set SSL to true or false
   proxyconfig_setSsl(_proxymanager_useSslFromConfigFile());

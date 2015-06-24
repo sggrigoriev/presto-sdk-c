@@ -74,6 +74,12 @@ int libhttpcomm_sendMsg(CURLSH * shareCurlHandle, CURLoption httpMethod,
     http_param_t params, int(*ProgressCallback)(void *clientp, double dltotal,
         double dlnow, double ultotal, double ulnow));
 
+int libhttpcomm_postMsg(CURLSH * shareCurlHandle, CURLoption httpMethod,
+    const char *url, const char *sslCertPath, const char *authToken,
+    char *msgToSendPtr, int msgToSendSize, char *rxBuffer, int maxRxBufferSize,
+    http_param_t params, int(*ProgressCallback)(void *clientp, double dltotal,
+        double dlnow, double ultotal, double ulnow));
+
 int libhttpcomm_getFile(CURLSH * shareCurlHandle, const char *url,
     const char *sslCertPath, const char *authToken, FILE *rxfile,
     int maxRxFileSize, http_timeout_t timeouts, int(*ProgressCallback)(

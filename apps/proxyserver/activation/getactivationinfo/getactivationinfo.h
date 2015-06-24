@@ -38,8 +38,14 @@ typedef struct getactivationinfo_info_t {
       char xmlTag[GETACTIVATIONINFO_XML_TAG_SIZE];
 } getactivationinfo_info_t;
 
+typedef struct registrationinfo_info_t {
+      int resultCode;
+      char xmlTag[GETACTIVATIONINFO_XML_TAG_SIZE];
+} registrationinfo_info_t;
+
 /***************** Public Prototypes ****************/
 char *getactivationinfo_getDeviceActivationKey(const char *key, int locationId);
+error_t registerDevice(void);
 
 #endif
 

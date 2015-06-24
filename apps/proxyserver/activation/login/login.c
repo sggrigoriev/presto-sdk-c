@@ -184,7 +184,7 @@ static void _login_xml_charactersHandler(void *ctx, const xmlChar *ch, int len) 
 
     } else if (strcmp(loginInfo->xmlTag, "key") == 0) {
       snprintf(apiKey, sizeof(apiKey), "%s", output);
-
+      libconfigio_write(proxycli_getConfigFilename(), CONFIGIO_API_KEY, apiKey);
     } else {
       SYSLOG_DEBUG("Login does not support XML tag %s", loginInfo->xmlTag);
     }

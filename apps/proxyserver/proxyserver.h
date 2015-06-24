@@ -69,4 +69,7 @@
 /** Name of the user that activated the proxy */
 #define CONFIGIO_PROXY_ACTIVATION_USERNAME "USER_ACTIVATION_USERNAME"
 
+/** API Key for logined user */
+#define	CONFIGIO_API_KEY "API_KEY"
+
 #endif

@@ -273,9 +273,20 @@ int libhttpcomm_sendMsg(CURLSH * shareCurlHandle, CURLoption httpMethod, const c
     {
 	if ( httpMethod == CURLOPT_POST )
 	{
-	    slist = curl_slist_append(slist, "Content-Type: text/xml");
-	    snprintf(tempString, sizeof(tempString), "Content-Length: %d", msgToSendSize);
-	    slist = curl_slist_append(slist, tempString);
+	    if ( msgToSendSize > 0 )
+	    {
+		slist = curl_slist_append(slist, "Content-Type: text/xml");
+		snprintf(tempString, sizeof(tempString), "Content-Length: %d", msgToSendSize);
+		slist = curl_slist_append(slist, tempString);
+	    }
+	    else if ( msgToSendSize == 0 )
+	    {
+		snprintf(tempString, sizeof(tempString), "Content-Length: %d", msgToSendSize);
+		if ( params.key != NULL )
+		{
+		    slist = curl_slist_append(slist, params.key);
+		}
+	    }
 	}
 	else if ( httpMethod  == CURLOPT_HTTPGET )
 	{
@@ -310,27 +321,30 @@ int libhttpcomm_sendMsg(CURLSH * shareCurlHandle, CURLoption httpMethod, const c
         // data to be sent to the server... so curl will read data from us.
         if(msgToSendPtr != NULL)
         {
-            curlResult = curl_easy_setopt(curlHandle, CURLOPT_READFUNCTION, read_callback);
-            if (curlResult != CURLE_OK)
-            {
-                SYSLOG_ERR("%s CURLOPT_READFUNCTION", curl_easy_strerror(curlResult));
-                curlErrno = ENOEXEC;
-                goto out;
-            }
+	    if ( msgToSendSize > 0 )
+	    {
+		curlResult = curl_easy_setopt(curlHandle, CURLOPT_READFUNCTION, read_callback);
+		if (curlResult != CURLE_OK)
+		{
+		    SYSLOG_ERR("%s CURLOPT_READFUNCTION", curl_easy_strerror(curlResult));
+		    curlErrno = ENOEXEC;
+		    goto out;
+		}
 
-            //creating the curl object
-            // TODO: not sure that setting a pointer to a pointer that is scoped elsewhere is correct.
-            outBoundCommInfo.buffer = msgToSendPtr;
-            outBoundCommInfo.size = msgToSendSize;
-            /* pointer to pass to our read function */
-            // here you must put the file info
-            curlResult = curl_easy_setopt(curlHandle, CURLOPT_READDATA, &outBoundCommInfo);
-            if (curlResult != CURLE_OK)
-            {
-                SYSLOG_ERR("%s CURLOPT_READDATA", curl_easy_strerror(curlResult));
-                curlErrno = ENOEXEC;
-                goto out;
-            }
+		//creating the curl object
+		// TODO: not sure that setting a pointer to a pointer that is scoped elsewhere is correct.
+		outBoundCommInfo.buffer = msgToSendPtr;
+		outBoundCommInfo.size = msgToSendSize;
+		/* pointer to pass to our read function */
+		// here you must put the file info
+		curlResult = curl_easy_setopt(curlHandle, CURLOPT_READDATA, &outBoundCommInfo);
+		if (curlResult != CURLE_OK)
+		{
+		    SYSLOG_ERR("%s CURLOPT_READDATA", curl_easy_strerror(curlResult));
+		    curlErrno = ENOEXEC;
+		    goto out;
+		}
+	    }
         }
 
         // sets maximum size of our internal buffer
@@ -344,26 +358,26 @@ int libhttpcomm_sendMsg(CURLSH * shareCurlHandle, CURLoption httpMethod, const c
 
         // CURLOPT_WRITEFUNCTION and CURLOPT_WRITEDATA in this context refers to
         // data received from the server... so curl will write data to us.
-        curlResult = curl_easy_setopt(curlHandle, CURLOPT_WRITEFUNCTION, writer);
-        if (curlResult != CURLE_OK)
-        {
-            SYSLOG_ERR("%s CURLOPT_WRITEFUNCTION", curl_easy_strerror(curlResult));
-            curlErrno = ENOEXEC;
-            goto out;
-        }
+	curlResult = curl_easy_setopt(curlHandle, CURLOPT_WRITEFUNCTION, writer);
+	if (curlResult != CURLE_OK)
+	{
+	    SYSLOG_ERR("%s CURLOPT_WRITEFUNCTION", curl_easy_strerror(curlResult));
+	    curlErrno = ENOEXEC;
+	    goto out;
+	}
 
-        inBoundCommInfo.buffer = rxBuffer;
-        inBoundCommInfo.size = maxRxBufferSize;
+	inBoundCommInfo.buffer = rxBuffer;
+	inBoundCommInfo.size = maxRxBufferSize;
 
-        curlResult = curl_easy_setopt(curlHandle, CURLOPT_WRITEDATA, &inBoundCommInfo);
-        if (curlResult != CURLE_OK)
-        {
-            SYSLOG_ERR("%s CURLOPT_WRITEDATA", curl_easy_strerror(curlResult));
-            curlErrno = ENOEXEC;
-            goto out;
-        }
+	curlResult = curl_easy_setopt(curlHandle, CURLOPT_WRITEDATA, &inBoundCommInfo);
+	if (curlResult != CURLE_OK)
+	{
+	    SYSLOG_ERR("%s CURLOPT_WRITEDATA", curl_easy_strerror(curlResult));
+	    curlErrno = ENOEXEC;
+	    goto out;
+	}
 
-        curlResult = curl_easy_perform(curlHandle);
+	curlResult = curl_easy_perform(curlHandle);
 
         curl_easy_getinfo(curlHandle, CURLINFO_APPCONNECT_TIME, &connectDuration );
         curl_easy_getinfo(curlHandle, CURLINFO_NAMELOOKUP_TIME, &nameResolvingDuration );
@@ -421,6 +435,260 @@ int libhttpcomm_sendMsg(CURLSH * shareCurlHandle, CURLoption httpMethod, const c
             /* put the result into the main buffer and return */
             if (params.verbose == true) SYSLOG_DEBUG("received msg length %d", strlen(rxBuffer));
             if(msgToSendPtr != NULL)
+            {
+              msgToSendPtr[0] = 0;
+            }
+
+        }else
+        {
+            SYSLOG_DEBUG("received time-out message from the server");
+            rxBuffer[0] = '\0';
+            curlErrno = EAGAIN;
+            goto out;
+        }
+    }
+    else
+    {
+        SYSLOG_ERR("curl_easy_init failed");
+        curlErrno = ENOEXEC;
+    }
+
+    out:
+      _libhttpcomm_closeHttp(curlHandle, slist);
+      return (int)curlErrno;
+}
+
+/**
+ * @brief   Sends a message through HTTP to PPC servers
+ *
+ * @param   shareCurlHandle: Curl handle shared across connections
+ * @param   httpMethod: CURLOPT_POST or CURLOPT_HTTPGET
+ * @param   url: url of the server (hostname + uri)
+ * @param   sslCertPath: location of where the certificate is
+ * @param   authToken: authentication token to be added in the header
+ * @param   msgToSendPtr: ptr to message to send. NULL if none
+ * @param   msgToSendSize: send of msgToSendPtr
+ * @param   rxBuffer: ptr for storing message received by the server -> must exist
+ * @param   maxRxBufferSize: max size of rxBuffer in bytes -> if 0 it is assumed that rxBuffer is of type FILE*
+ * @param   timeouts: specifies connect and transfer timeouts for the connection
+ * @param   ProgressCallback: function pointer that will be called every second during the connection
+ *
+ * @return  true for success, false for failure
+ */
+int libhttpcomm_postMsg(CURLSH * shareCurlHandle, CURLoption httpMethod, const char *url, const char *sslCertPath, const char *authToken,
+                char *msgToSendPtr, int msgToSendSize, char *rxBuffer, int maxRxBufferSize, http_param_t params,
+                int (*ProgressCallback) (void *clientp, double dltotal, double dlnow, double ultotal, double ulnow))
+{
+    CURL * curlHandle = NULL;
+    CURLcode curlResult;
+    char tempString[PATH_MAX];
+    char errorBuffer[CURL_ERROR_SIZE];
+    struct HttpIoInfo outBoundCommInfo;
+    struct HttpIoInfo inBoundCommInfo;
+    struct curl_slist *slist = NULL;
+    double connectDuration = 0.0;
+    double transferDuration = 0.0;
+    double nameResolvingDuration = 0.0;
+    long httpResponseCode = 0;
+    long httpConnectCode = 0;
+    long curlErrno = 0;
+
+    assert (rxBuffer);
+    assert(url);
+
+    if (params.verbose == true)
+    {
+        if (msgToSendPtr != NULL)
+        {
+            SYSLOG_DEBUG("httpMethod: 0x%x, url: %s, size: %d, outgoing msg: %s",
+                    httpMethod, url, msgToSendSize, msgToSendPtr);
+        }else
+        {
+            SYSLOG_DEBUG("httpMethod: 0x%x, url: %s", httpMethod, url);
+        }
+    }
+
+    rxBuffer[0] = 0;
+
+    curlHandle = curl_easy_init();
+
+    if ( params.key != NULL )
+    {
+	slist = curl_slist_append(slist, params.key);
+	slist = curl_slist_append(slist, "Content-Type:");
+    }
+
+    if (curlHandle)
+    {
+	if ( httpMethod == CURLOPT_POST )
+	{
+	    if ( msgToSendSize > 0 )
+	    {
+		slist = curl_slist_append(slist, "Content-Type: text/xml");
+		snprintf(tempString, sizeof(tempString), "Content-Length: %d", msgToSendSize);
+		slist = curl_slist_append(slist, tempString);
+	    }
+	    else if ( msgToSendSize == 0 )
+	    {
+		snprintf(tempString, sizeof(tempString), "Content-Length: %d", msgToSendSize);
+		slist = curl_slist_append(slist, tempString);
+	    }
+	}
+	else if ( httpMethod  == CURLOPT_HTTPGET )
+	{
+	    if ( params.password != NULL )
+	    {
+		SYSLOG_ERR("password: %s", params.password);
+		slist = curl_slist_append(slist, params.password);
+	    }
+	    if ( params.key != NULL )
+	    {
+		SYSLOG_ERR("key: %s", params.key);
+		slist = curl_slist_append(slist, params.key);
+	    }
+	}
+
+        if (_libhttpcomm_configureHttp(curlHandle, shareCurlHandle, slist, httpMethod, url,
+                sslCertPath, authToken, params.timeouts, ProgressCallback) == false)
+        {
+            curlErrno = ENOEXEC;
+            goto out;
+        }
+
+        curlResult = curl_easy_setopt(curlHandle, CURLOPT_ERRORBUFFER, errorBuffer);
+        if (curlResult != CURLE_OK)
+        {
+            SYSLOG_ERR("%s CURLOPT_ERRORBUFFER", curl_easy_strerror(curlResult));
+            curlErrno = ENOEXEC;
+            goto out;
+        }
+
+        // CURLOPT_READFUNCTION and CURLOPT_READDATA in this context refers to
+        // data to be sent to the server... so curl will read data from us.
+        if(msgToSendPtr != NULL)
+        {
+	    if ( msgToSendSize > 0 )
+	    {
+		curlResult = curl_easy_setopt(curlHandle, CURLOPT_READFUNCTION, read_callback);
+		if (curlResult != CURLE_OK)
+		{
+		    SYSLOG_ERR("%s CURLOPT_READFUNCTION", curl_easy_strerror(curlResult));
+		    curlErrno = ENOEXEC;
+		    goto out;
+		}
+
+		//creating the curl object
+		// TODO: not sure that setting a pointer to a pointer that is scoped elsewhere is correct.
+		outBoundCommInfo.buffer = msgToSendPtr;
+		outBoundCommInfo.size = msgToSendSize;
+		/* pointer to pass to our read function */
+		// here you must put the file info
+		curlResult = curl_easy_setopt(curlHandle, CURLOPT_READDATA, &outBoundCommInfo);
+		if (curlResult != CURLE_OK)
+		{
+		    SYSLOG_ERR("%s CURLOPT_READDATA", curl_easy_strerror(curlResult));
+		    curlErrno = ENOEXEC;
+		    goto out;
+		}
+	    }
+        }
+
+        // sets maximum size of our internal buffer
+        curlResult = curl_easy_setopt(curlHandle, CURLOPT_BUFFERSIZE, maxRxBufferSize);
+        if (curlResult != CURLE_OK)
+        {
+            SYSLOG_ERR("%s CURLOPT_BUFFERSIZE", curl_easy_strerror(curlResult));
+            curlErrno = ENOEXEC;
+            goto out;
+        }
+
+        // CURLOPT_WRITEFUNCTION and CURLOPT_WRITEDATA in this context refers to
+        // data received from the server... so curl will write data to us.
+	curlResult = curl_easy_setopt(curlHandle, CURLOPT_WRITEFUNCTION, writer);
+	if (curlResult != CURLE_OK)
+	{
+	    SYSLOG_ERR("%s CURLOPT_WRITEFUNCTION", curl_easy_strerror(curlResult));
+	    curlErrno = ENOEXEC;
+	    goto out;
+	}
+
+	inBoundCommInfo.buffer = rxBuffer;
+	inBoundCommInfo.size = maxRxBufferSize;
+
+	curlResult = curl_easy_setopt(curlHandle, CURLOPT_WRITEDATA, &inBoundCommInfo);
+	if (curlResult != CURLE_OK)
+	{
+	    SYSLOG_ERR("%s CURLOPT_WRITEDATA", curl_easy_strerror(curlResult));
+	    curlErrno = ENOEXEC;
+	    goto out;
+	}
+
+	curlResult = curl_easy_setopt(curlHandle, CURLOPT_POSTFIELDS, NULL);
+	if (curlResult != CURLE_OK)
+	{
+	    SYSLOG_ERR("%s CURLOPT_POSTFIELDS", curl_easy_strerror(curlResult));
+	    curlErrno = ENOEXEC;
+	    goto out;
+	}
+
+	curlResult = curl_easy_perform(curlHandle);
+
+        curl_easy_getinfo(curlHandle, CURLINFO_APPCONNECT_TIME, &connectDuration );
+        curl_easy_getinfo(curlHandle, CURLINFO_NAMELOOKUP_TIME, &nameResolvingDuration );
+        curl_easy_getinfo(curlHandle, CURLINFO_TOTAL_TIME, &transferDuration );
+        curl_easy_getinfo(curlHandle, CURLINFO_RESPONSE_CODE, &httpResponseCode );
+        curl_easy_getinfo(curlHandle, CURLINFO_HTTP_CONNECTCODE, &httpConnectCode );
+
+        if (httpResponseCode >= 300 || httpConnectCode >= 300)
+        {
+            if (params.verbose == true) SYSLOG_ERR("HTTP error response code:%ld, connect code:%ld", httpResponseCode, httpConnectCode);
+            curlErrno = EHOSTUNREACH;
+            goto out;
+        }
+
+        if (curlResult != CURLE_OK)
+        {
+            if (curlResult != CURLE_ABORTED_BY_CALLBACK)
+            {
+                if (curl_easy_getinfo(curlHandle, CURLINFO_OS_ERRNO, &curlErrno) != CURLE_OK)
+                {
+                    curlErrno = ENOEXEC;
+                    SYSLOG_ERR("curl_easy_getinfo");
+                }
+                if (curlResult == CURLE_OPERATION_TIMEDOUT) curlErrno = ETIMEDOUT; /// time out error must be distinctive
+                else if (curlErrno == 0) curlErrno = ENOEXEC; /// can't be equalt to 0 if curlResult != CURLE_OK
+
+                if (params.verbose == true) SYSLOG_WARNING("%s, %s for url %s",
+                        curl_easy_strerror(curlResult), strerror((int)curlErrno), url);
+            }else
+            {
+                curlErrno = EAGAIN;
+                if (params.verbose == true) SYSLOG_DEBUG("quitting curl transfer");
+            }
+            goto out;
+        }else if (params.verbose == true)
+        {
+            if (nameResolvingDuration >= 2.0)
+            {
+                SYSLOG_WARNING("connectDuration=%.2lf, nameResolvingDuration=%.2lf, transferDuration=%.2lf, "
+                        "httpConnectCode=%ld",
+                        connectDuration, nameResolvingDuration, transferDuration, httpConnectCode);
+            }
+            else
+            {
+                SYSLOG_DEBUG("connectDuration=%.2lf, nameResolvingDuration=%.2lf, transferDuration=%.2lf, "
+                        "httpConnectCode=%ld",
+                        connectDuration, nameResolvingDuration, transferDuration, httpConnectCode);
+            }
+        }
+
+        // the following is a special case - a time-out from the server is going to return a
+        // string with 1 character in it ...
+        if (strlen(rxBuffer) > 1)
+        {
+            /* put the result into the main buffer and return */
+            if (params.verbose == true) SYSLOG_DEBUG("received msg length %d", strlen(rxBuffer));
+            if(msgToSendPtr != NULL && msgToSendSize > 0 )
             {
               msgToSendPtr[0] = 0;
             }

@@ -71,6 +71,7 @@ void _proxyserver_processMessage(int clientSocketFd);
 void _proxyserver_listener(const char *message, int len);
 
 
+
 /***************** Functions *****************/
 /**
  * Main function
@@ -111,18 +112,29 @@ int main(int argc, char *argv[]) {
       exit(1);
 
     } else {
-      // Activate with username and password
+      // Register device with username and password
       if(login_doLogin(proxycli_getUsername(), proxycli_getPassword()) == SUCCESS) {
-        if(proxyactivation_activate(getactivationinfo_getDeviceActivationKey(login_getApiKey(), user_getLocationId(login_getApiKey())), proxycli_getUsername()) == SUCCESS) {
-          printf("Activated! Exiting.\n\n");
-          SYSLOG_INFO("Activated! Exiting.\n\n");
-          exit(0);
-        }
+	  // Activate with username and password
+#ifdef PROXY_ACTIVATION
+	  if(proxyactivation_activate(getactivationinfo_getDeviceActivationKey(login_getApiKey(), user_getLocationId(login_getApiKey())), proxycli_getUsername()) == SUCCESS) {
+	      printf("Activated! Exiting.\n\n");
+	      SYSLOG_INFO("Activated! Exiting.\n\n");
+	      exit(0);
+	  }
+#endif
+	  if ( registerDevice() == 0 )
+	  {
+	      printf("Proxy registered!\n\n");
+	      SYSLOG_INFO("Proxy registered!\n\n");
+	  }
+	  else
+	  {
+	      printf("Activation failed. Exiting. (login_doLogin) \n\n");
+	      SYSLOG_ERR("Activation failed. Exiting. (login_doLogin)\n\n");
+	      exit(1);
+	  }
       }
 
-      printf("Activation failed. Exiting. (login_doLogin) \n\n");
-      SYSLOG_ERR("Activation failed. Exiting. (login_doLogin)\n\n");
-      exit(1);
     }
   }
 
