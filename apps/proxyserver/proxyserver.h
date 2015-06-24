@@ -31,6 +31,22 @@
 #define DEFAULT_ACTIVATION_URL "developer.peoplepowerco.com/cloud/xml"
 #endif
 
+#ifndef	DEFAULT_XML_API_BASE_URL
+#define	DEFAULT_XML_API_BASE_URL    "cloud/xml"
+#endif
+
+#ifndef	DEFAULT_JSON_API_BASE_URL
+#define	DEFAULT_JSON_API_BASE_URL    "cloud/json"
+#endif
+
+#ifndef DEFAULT_CLOUD_NAME
+#define	DEFAULT_CLOUD_NAME "Developer"
+#endif
+
+#ifndef DEFAULt_API_UPDATE_PERIOD
+#define	DEFAULt_API_UPDATE_PERIOD   86400
+#endif
+
 #ifndef DEFAULT_PROXY_DEVICETYPE
 #define DEFAULT_PROXY_DEVICETYPE "4"
 #endif
@@ -47,6 +63,9 @@
 
 /** Token to store the number of times this proxy app has been rebooted */
 #define CONFIGIO_PROXY_REBOOTS "PROXY_REBOOTS"
+
+/** Token for cloud name of getting connection setting, i.e. "Developer" */
+#define CONFIGIO_CLOUD_NAME "CLOUD_NAME"
 
 /** Token for host address of the cloud, i.e. "developers.peoplepowerco.com" */
 #define CONFIGIO_CLOUD_HOST "CLOUD_HOST"
@@ -65,6 +84,12 @@
 
 /** Name of the token in our config file that stores the activation url */
 #define CONFIGIO_ACTIVATION_URL_TOKEN_NAME "APPLICATION_API_URL"
+
+/** Name of the token in our config file that stores last update time of application API url */
+#define	CONFIGIO_API_URL_LAST_UPDATE_TIME_TOKEN_NAME "APPLICATION_API_LAST_UPDATE_TIME"
+
+/** Name of the token in our config file that stores how long we need to re-get FabrUX connection settings, in seconds */
+#define	CONFIGIO_API_URL_UPDATE_PERIOD "APPLICATION_API_UPDATE_PERIOD"
 
 /** Name of the user that activated the proxy */
 #define CONFIGIO_PROXY_ACTIVATION_USERNAME "USER_ACTIVATION_USERNAME"

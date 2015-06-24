@@ -159,7 +159,7 @@ error_t proxy_start(const char *url) {
 
     if (stackSize < 65535) {
       // stack size must be at least 64K for curl to operate
-      SYSLOG_WARNING("Stack size may be too small for curl: %u bytes", stackSize);
+      SYSLOG_WARNING("Stack size may be too small for curl: %u bytes", (unsigned)stackSize);
     }
   }
 

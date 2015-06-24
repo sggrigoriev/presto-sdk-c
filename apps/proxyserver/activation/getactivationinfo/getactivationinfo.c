@@ -133,8 +133,6 @@ char *getactivationinfo_getDeviceActivationKey(const char *key, int locationId) 
     strncpy(baseUrl, DEFAULT_ACTIVATION_URL, sizeof(baseUrl));
   }
 
-  //snprintf(url, sizeof(url), "%s/deviceActivationInfo/%s/%d/%s?sendEmail=false", baseUrl, key, locationId, deviceType);
-  // https://developer.presencepro.com/cloud/json/devices/001C42DE23CF-4-33F?productId=4
   snprintf(url, sizeof(url), "%s/locations/%d/deviceActivation/%s", baseUrl, locationId, deviceType);
 
   //SYSLOG_INFO("Getting device activation key...");

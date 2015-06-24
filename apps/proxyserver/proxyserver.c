@@ -42,6 +42,7 @@
 #include "libconfigio.h"
 #include "libpipecomm.h"
 
+#include "settings.h"
 #include "login.h"
 #include "user.h"
 #include "getactivationinfo.h"
@@ -83,6 +84,7 @@ int main(int argc, char *argv[]) {
   struct sockaddr_in serverAddress;
   struct sockaddr_in clientAddress;
   char eui64[EUI64_STRING_SIZE+8];
+  char cloudName[PATH_MAX];
 
   // Ignore the SIGCHLD signal to get rid of zombies
   signal(SIGCHLD, SIG_IGN);
@@ -95,6 +97,19 @@ int main(int argc, char *argv[]) {
 
   printf("Using configuration file %s\n", proxycli_getConfigFilename());
   SYSLOG_INFO("Using configuration file %s", proxycli_getConfigFilename());
+
+  // Get FabrUX connection settings
+  eui64_toString(eui64, sizeof(eui64));
+  printf("The proxy device ID is %s\n", eui64);
+  SYSLOG_INFO("The proxy device ID is %s\n", eui64);
+
+  if(libconfigio_read(proxycli_getConfigFilename(), CONFIGIO_CLOUD_NAME, cloudName, sizeof(cloudName)) == -1) {
+    printf("Couldn't read %s in file %s, writing default value\n", CONFIGIO_CLOUD_NAME, proxycli_getConfigFilename());
+    libconfigio_write(proxycli_getConfigFilename(), CONFIGIO_CLOUD_NAME, DEFAULT_CLOUD_NAME);
+    strncpy(cloudName, DEFAULT_CLOUD_NAME, sizeof(cloudName));
+  }
+
+  getConnectionSettings(eui64, cloudName);
 
   // If the CLI tells us to activate this proxy, then activate it and exit now.
   if(proxycli_readyToActivate()) {
@@ -175,9 +190,6 @@ int main(int argc, char *argv[]) {
   SYSLOG_INFO("Proxy running; port=%d; pid=%d\n", proxycli_getPort(), getpid());
   printf("Proxy running; port=%d; pid=%d\n", proxycli_getPort(), getpid());
 
-  eui64_toString(eui64, sizeof(eui64));
-  printf("The proxy device ID is %s\n", eui64);
-  SYSLOG_INFO("The proxy device ID is %s\n", eui64);
 
   while (!gTerminate) {
     clientSocketFd = accept(sockfd, (struct sockaddr *) &clientAddress, &clientLen);
