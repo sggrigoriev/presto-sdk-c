@@ -78,8 +78,6 @@ void api_update_timer_init (void);
 void timer_thread_init ( void );
 
 
-
-static char cloudName[PATH_MAX];
 static char eui64[EUI64_STRING_SIZE+8];
 pthread_t timer_thread;
 /***************** Functions *****************/
@@ -110,13 +108,45 @@ int main(int argc, char *argv[]) {
   printf("The proxy device ID is %s\n", eui64);
   SYSLOG_INFO("The proxy device ID is %s\n", eui64);
 
-  if(libconfigio_read(proxycli_getConfigFilename(), CONFIGIO_CLOUD_NAME, cloudName, sizeof(cloudName)) == -1) {
-    printf("Couldn't read %s in file %s, writing default value\n", CONFIGIO_CLOUD_NAME, proxycli_getConfigFilename());
-    libconfigio_write(proxycli_getConfigFilename(), CONFIGIO_CLOUD_NAME, DEFAULT_CLOUD_NAME);
-    strncpy(cloudName, DEFAULT_CLOUD_NAME, sizeof(cloudName));
+  if ( proxycli_getCloudName() == NULL )
+  {
+      char cloudName[PATH_MAX];
+      if( libconfigio_read(proxycli_getConfigFilename(), CONFIGIO_CLOUD_NAME, cloudName, sizeof(cloudName)) > -1 )
+      {
+	  proxycli_setCloudName(cloudName);
+      }
+      else
+      {
+	  printf("Couldn't read %s in file %s, writing default value\n", CONFIGIO_CLOUD_NAME, proxycli_getConfigFilename());
+	  libconfigio_write(proxycli_getConfigFilename(), CONFIGIO_CLOUD_NAME, DEFAULT_CLOUD_NAME);
+	  proxycli_setCloudName(DEFAULT_CLOUD_NAME);
+      }
+  }
+  else
+  {
+      libconfigio_write(proxycli_getConfigFilename(), CONFIGIO_CLOUD_NAME, proxycli_getCloudName());
   }
 
-  getConnectionSettings(eui64, cloudName);
+  if ( proxycli_getDataFormat() == NULL )
+  {
+      char dataFormat[PATH_MAX];
+      if( libconfigio_read(proxycli_getConfigFilename(), CONFIGIO_DATA_FORMAT_TOKEN_NAME, dataFormat, sizeof(dataFormat)) > -1 )
+      {
+	  proxycli_setDataFormat(dataFormat);
+      }
+      else
+      {
+	  printf("Couldn't read %s in file %s, writing default value %s\n", CONFIGIO_DATA_FORMAT_TOKEN_NAME, proxycli_getConfigFilename(), DEFAULT_DATA_FORMAT);
+	  libconfigio_write(proxycli_getConfigFilename(), CONFIGIO_DATA_FORMAT_TOKEN_NAME, DEFAULT_DATA_FORMAT);
+	  proxycli_setDataFormat(DEFAULT_DATA_FORMAT);
+      }
+  }
+  else
+  {
+      libconfigio_write(proxycli_getConfigFilename(), CONFIGIO_DATA_FORMAT_TOKEN_NAME, proxycli_getDataFormat());
+  }
+
+  getConnectionSettings(eui64, proxycli_getCloudName());
 
   // If the CLI tells us to activate this proxy, then activate it and exit now.
   if(proxycli_readyToActivate()) {
@@ -375,6 +405,6 @@ void timer_thread_init ( void )
  */
 void _timer_handler ( int signum )
 {
-    getConnectionSettings(eui64, cloudName);
+    getConnectionSettings(eui64, proxycli_getCloudName());
 }
 

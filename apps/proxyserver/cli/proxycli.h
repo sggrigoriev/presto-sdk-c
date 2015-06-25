@@ -21,6 +21,7 @@
 
 enum {
   PROXYCLI_CONFIG_FILE_PATH_SIZE = 40,
+  PROXYCLI_CONFIG_CLOUD_NAME_SIZE = 16,
 };
 
 /***************** Public Prototypes ****************/
@@ -37,6 +38,14 @@ const char *proxycli_getUsername();
 const char *proxycli_getPassword();
 
 const bool proxycli_readyToActivate();
+
+const char *proxycli_setCloudName( const char * );
+
+const char *proxycli_setDataFormat( const char * );
+
+const char *proxycli_getCloudName();
+
+const char *proxycli_getDataFormat();
 
 #endif
 

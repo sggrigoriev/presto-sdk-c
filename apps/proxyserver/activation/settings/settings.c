@@ -180,6 +180,9 @@ static void _user_xml_startElementHandler(void *ctx, const xmlChar *name, const 
 		    snprintf(baseUrl, sizeof(baseUrl), "%s:%s/%s", host, altPort, DEFAULT_XML_API_BASE_URL);
 		    libconfigio_write(proxycli_getConfigFilename(), CONFIGIO_ACTIVATION_URL_TOKEN_NAME, baseUrl);
 
+		    printf("Application API: %s\n", baseUrl);
+		    SYSLOG_INFO("Application API: %s", baseUrl);
+
 		    return;
 		}
 	    }

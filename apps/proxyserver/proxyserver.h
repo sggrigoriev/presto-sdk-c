@@ -31,6 +31,10 @@
 #define DEFAULT_ACTIVATION_URL "developer.peoplepowerco.com/cloud/xml"
 #endif
 
+#ifndef DEFAULT_DATA_FORMAT
+#define	DEFAULT_DATA_FORMAT "xml"
+#endif
+
 #ifndef	DEFAULT_XML_API_BASE_URL
 #define	DEFAULT_XML_API_BASE_URL    "cloud/xml"
 #endif
@@ -54,6 +58,9 @@
 #ifndef DEFAULT_PROXY_CONFIG_FILENAME
 #define DEFAULT_PROXY_CONFIG_FILENAME "proxy.conf"
 #endif
+
+/** Name of the token in our config file that data format interacting with FabrUX */
+#define CONFIGIO_DATA_FORMAT_TOKEN_NAME "DATA_FORMAT"
 
 /** Name of the token in our config file that stores the device type */
 #define CONFIGIO_PROXY_DEVICE_TYPE_TOKEN_NAME "PROXY_DEVICE_TYPE"
