@@ -71,8 +71,17 @@ void _proxyserver_processMessage(int clientSocketFd);
 
 void _proxyserver_listener(const char *message, int len);
 
+void _timer_handler ( int signum );
+
+void api_update_timer_init (void);
+
+void timer_thread_init ( void );
 
 
+
+static char cloudName[PATH_MAX];
+static char eui64[EUI64_STRING_SIZE+8];
+pthread_t timer_thread;
 /***************** Functions *****************/
 /**
  * Main function
@@ -83,8 +92,6 @@ int main(int argc, char *argv[]) {
   socklen_t clientLen;
   struct sockaddr_in serverAddress;
   struct sockaddr_in clientAddress;
-  char eui64[EUI64_STRING_SIZE+8];
-  char cloudName[PATH_MAX];
 
   // Ignore the SIGCHLD signal to get rid of zombies
   signal(SIGCHLD, SIG_IGN);
@@ -190,6 +197,8 @@ int main(int argc, char *argv[]) {
   SYSLOG_INFO("Proxy running; port=%d; pid=%d\n", proxycli_getPort(), getpid());
   printf("Proxy running; port=%d; pid=%d\n", proxycli_getPort(), getpid());
 
+  // Initial timer thread.
+  timer_thread_init();
 
   while (!gTerminate) {
     clientSocketFd = accept(sockfd, (struct sockaddr *) &clientAddress, &clientLen);
@@ -212,7 +221,9 @@ int main(int argc, char *argv[]) {
         // Child process
         SYSLOG_INFO("[%d]: New client listener created", getpid());
         close(sockfd);
-        while (true) {
+
+
+	while (true) {
           // Read messages from the client until the socket is closed
           _proxyserver_processMessage(clientSocketFd);
           sleep(1);
@@ -223,7 +234,7 @@ int main(int argc, char *argv[]) {
         exit(0);
 
       } else {
-        // Parent process
+	  // Parent process
 
       }
     }
@@ -297,5 +308,73 @@ void  _proxyserver_processMessage(int clientSocketFd) {
     exit(0);
   }
 
+}
+
+/**
+ * Application API update timer initiator
+ * 
+ */
+void api_update_timer_init (void)
+{
+    char updatePeriod[16];
+    struct sigaction sa;
+    struct itimerval timer;
+    
+    /* Install timer_handler as the signal handler for SIGVTALRM. */
+    memset (&sa, 0, sizeof (sa));
+    sa.sa_handler = &_timer_handler;
+    sigaction(SIGVTALRM, &sa, NULL);
+
+    /* Configure */
+    if(libconfigio_read(proxycli_getConfigFilename(), CONFIGIO_API_URL_UPDATE_PERIOD, updatePeriod, sizeof(updatePeriod)) == -1) {
+	printf("Couldn't read %s in file %s, writing default value\n", CONFIGIO_API_URL_UPDATE_PERIOD, proxycli_getConfigFilename());
+	libconfigio_write(proxycli_getConfigFilename(), CONFIGIO_API_URL_UPDATE_PERIOD, DEFAULT_API_UPDATE_PERIOD);
+	strncpy(updatePeriod, DEFAULT_API_UPDATE_PERIOD, sizeof(updatePeriod));
+    }
+
+    timer.it_value.tv_sec = atoi(updatePeriod);
+    timer.it_value.tv_usec = 0;
+    timer.it_interval.tv_sec = atoi(updatePeriod);
+    timer.it_interval.tv_usec = 0;
+    
+    if ( setitimer(ITIMER_VIRTUAL, &timer, NULL) == 0 )
+    {
+	while (1);
+    }
+    else
+    {
+	SYSLOG_ERR("Get FabrUX connection setting interval initiate failed.\n");
+    }
+}
+
+/**
+ * Timer thread
+ * 
+ */
+void *timer_thread_func ( void *arg )
+{
+    // Inital a timer for update application API url from APP API: Available FabrUX instances
+    api_update_timer_init();
+
+    return NULL;
+}
+
+/**
+ * Timer thread initiator
+ * 
+ */
+void timer_thread_init ( void )
+{
+    pthread_create(&timer_thread, NULL, timer_thread_func, NULL);
+}
+
+/**
+ * Application API update timer handler
+ *
+ * @param signum
+ */
+void _timer_handler ( int signum )
+{
+    getConnectionSettings(eui64, cloudName);
 }
 
