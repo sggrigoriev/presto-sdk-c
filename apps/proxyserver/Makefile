@@ -64,6 +64,7 @@ CFLAGS += -I../../iot/xml/parser
 CFLAGS += -I../../lib/3rdparty/${LIBXML2_VERSION}/include
 CFLAGS += -I../../lib/3rdparty/${LIBCURL_VERSION}/include
 CFLAGS += -I../../lib/3rdparty/${OPENSSL_VERSION}/include
+CFLAGS += -I../../lib/3rdparty/${CJSON_VERSION}
 
 # Version information
 CFLAGS += -DGIT_FIRMWARE_VERSION=$(shell git log -1 --pretty=format:0x%h)
@@ -78,7 +79,7 @@ export HARDWARE_PLATFORM = INTEL
 OBJECTS_C = $(SOURCES_C:.c=.o)
 OBJECTS_CPP = $(SOURCES_CPP:.cpp=.o)
 
-LDEXTRA += -L../../lib -liotxml -lhttpcomm -lpipecomm -lxml2 -lconfigio -lcurl -lpthread -lm
+LDEXTRA += -L../../lib -liotxml -lhttpcomm -lpipecomm -lxml2 -lconfigio -lcurl -lpthread -lm -lcJSON
 LDFLAGS += -Wl,-rpath,/opt/lib
 
 CFLAGS += -Os

@@ -21,6 +21,7 @@
  * @author David Moss
  */
 
+#include <linux/limits.h>
 #include <ctype.h>
 #include <unistd.h>
 #include <stdbool.h>
@@ -37,6 +38,12 @@
 
 /** Port number */
 static int port = DEFAULT_PROXY_PORT;
+
+/** Application API base URL */
+static char applicationApiBaseUrl[PATH_MAX];
+
+/** Application API URL */
+static char applicationApiUrl[PATH_MAX];
 
 /** Pointer to the activation key string */
 static char *activationKey;
@@ -69,9 +76,16 @@ void proxycli_parse(int argc, char *argv[]) {
   int c;
 
   strncpy(configFilename, DEFAULT_PROXY_CONFIG_FILENAME, PROXYCLI_CONFIG_FILE_PATH_SIZE);
+  strncpy(applicationApiBaseUrl, DEFAULT_APPLICATION_API_BASE_URL, sizeof(applicationApiBaseUrl));
 
-  while ((c = getopt(argc, argv, "u:p:c:l:n:a:f:v")) != -1) {
+  while ((c = getopt(argc, argv, "b:u:p:c:l:n:a:f:v")) != -1) {
     switch (c) {
+    case 'b':
+      strncpy(applicationApiBaseUrl, optarg, sizeof(applicationApiBaseUrl));
+      printf("[cli] The application API base URL is %s\n", applicationApiBaseUrl);
+      SYSLOG_INFO("[cli] The application API base URL is %s", applicationApiBaseUrl);
+      break;
+
     case 'c':
       strncpy(configFilename, optarg, PROXYCLI_CONFIG_FILE_PATH_SIZE);
       printf("[cli] Proxy config file set to %s\n", configFilename);
@@ -198,6 +212,31 @@ const char *proxycli_getCloudName ( void ) {
 const char *proxycli_getDataFormat ( void ) {
   return dataFormat;
 }
+
+/**
+ * @return The application API URL for proxyserver, e.g.: developer.peoplepowerco.com/cloud/xml 
+ */
+const char *proxycli_getApplicationApiUrl ( void ) {
+    snprintf(applicationApiUrl, sizeof(applicationApiUrl), "%s/%s", applicationApiBaseUrl, proxycli_getDataFormat());
+    return applicationApiUrl;
+}
+
+/**
+ * @param url The new application API base URL
+ * @return The application API base URL which proxyserver is interactive with, e.g: developer.peoplepowerco.com/cloud
+ */
+const char *proxycli_setApplicationApiBaseUrl ( const char *url ) {
+    strncpy(applicationApiBaseUrl, url, sizeof(applicationApiBaseUrl));
+    return applicationApiBaseUrl;
+}
+
+/**
+ * @return The application API base URL which proxyserver is interactive with, e.g: developer.peoplepowerco.com/cloud
+ */
+const char *proxycli_getApplicationApiBaseUrl ( void ) {
+    return applicationApiBaseUrl;
+}
+
 
 /**
  * @return The activation username

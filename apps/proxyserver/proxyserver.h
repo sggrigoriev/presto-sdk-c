@@ -27,6 +27,14 @@
 #define DEFAULT_PROXY_URL "developer.peoplepowerco.com:8080/deviceio/ml"
 #endif
 
+#ifndef DEFAULT_CLOUD_API_PREFIX
+#define	DEFAULT_CLOUD_API_PREFIX "cloud"
+#endif
+
+#ifndef DEFAULT_APPLICATION_API_BASE_URL
+#define	DEFAULT_APPLICATION_API_BASE_URL "developer.peoplepowerco.com/cloud"
+#endif
+
 #ifndef DEFAULT_ACTIVATION_URL
 #define DEFAULT_ACTIVATION_URL "developer.peoplepowerco.com/cloud/xml"
 #endif

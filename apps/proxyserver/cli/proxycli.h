@@ -43,9 +43,15 @@ const char *proxycli_setCloudName( const char * );
 
 const char *proxycli_setDataFormat( const char * );
 
-const char *proxycli_getCloudName();
+const char *proxycli_getCloudName( void );
 
-const char *proxycli_getDataFormat();
+const char *proxycli_getDataFormat( void );
+
+const char *proxycli_setApplicationApiBaseUrl ( const char *url );
+
+const char *proxycli_getApplicationApiBaseUrl ( void );
+
+const char *proxycli_getApplicationApiUrl ( void );
 
 #endif
 
