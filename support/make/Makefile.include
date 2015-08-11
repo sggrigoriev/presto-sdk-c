@@ -13,7 +13,7 @@ CFLAGS = -Os
 
 LIBXML2_VERSION=libxml2-2.7.8
 LIBCURL_VERSION=curl-7.21.7
-OPENSSL_VERSION=openssl-1.0.0d
+OPENSSL_VERSION=openssl-1.0.1d
 CJSON_VERSION=cJSON
 
 ifeq ($(HOST), mips-linux)
