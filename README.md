@@ -1,12 +1,12 @@
-FabrUX SDK in C
+Presto SDK in C
 =====================
-http://developer.peoplepowerco.com
+http://presto.peoplepowerco.com
 
-FabrUX SDK in C - Connecting devices, homes, communities, and buildings.
+Presto SDK in C - Connecting devices, homes, communities, and buildings.
 
-This software SDK works in conjunection with People Power FabrUX to cloud-enable IoT devices and protocols.
+This software SDK works in conjunection with People Power Presto to cloud-enable IoT devices and protocols.
 
-The FabrUX Device API, implemented by this C SDK, is designed for connecting low memory embedded hubs, gateways, WiFi routers, set-top boxes, and embedded end-devices to FabrUX. Once connected to FabrUX, these devices are instantly exposed through mobile apps, web consoles, and data analytics + rules engines that you can customize.
+The Presto Device API, implemented by this C SDK, is designed for connecting low memory embedded hubs, gateways, WiFi routers, set-top boxes, and embedded end-devices to Presto. Once connected to Presto, these devices are instantly exposed through the Ensemble software suite to support mobile apps, web consoles, and data analytics + rules engines that you can customize.
 
 It includes several directories:
 * /apps
@@ -162,17 +162,17 @@ proxyserver's socket and manage a set of similar devices.  It actually
 does not function, but it compiles. 
 
 The *apps/rtoaagent* is a fully working example application that connects
-Radio Thermostat of America thermostats to FabrUX.  Full source
+Radio Thermostat of America thermostats to Presto.  Full source
 code is available. We show how to discover, measure, control, and 
 synchronize the time on many RTOA thermostats on the local network from
 a computer, hub, gateway, router, or set-top box that acts as a bridge
-or a proxy to FabrUX.
+or a proxy to Presto.
 
 
 
 COPYRIGHT
 ----------
-Copyright 2013 People Power Company
+Copyright 2016 People Power Company
 
 This code was developed with funding from People Power Company
 
