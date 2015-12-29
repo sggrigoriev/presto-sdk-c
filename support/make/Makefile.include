@@ -36,13 +36,42 @@ ifeq ($(HOST), mips-linux)
 	
 else
 	# Build for this PC
-	CC = gcc
-	CPP = g++
-	AR = ar
-	STRIP=strip
-	INTEL = 0
-	CFLAGS+=-g3 -fPIC
-	LINK_FLAG=-fPIC
-	export HARDWARE_PLATFORM = INTEL
-endif
+	#CC = gcc
+	#CPP = g++
+	#AR = ar
+	#STRIP=strip
+	#INTEL = 0
+	#CFLAGS+=-g3 -fPIC
+	#LINK_FLAG=-fPIC
+	#export HARDWARE_PLATFORM = INTEL
 
+
+export PATH=/opt/windriver/wrlinux/5.0-intel-quark/sysroots/x86_64-wrlinuxsdk-linux/usr/bin:/opt/windriver/wrlinux/5.0-intel-quark/sysroots/x86_64-wrlinuxsdk-linux/usr/bin/i586-wrs-linux:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
+	export PKG_CONFIG_SYSROOT_DIR=/opt/windriver/wrlinux/5.0-intel-quark/sysroots/intel_quark-wrs-linux
+	export PKG_CONFIG_PATH=/opt/windriver/wrlinux/5.0-intel-quark/sysroots/intel_quark-wrs-linux/usr/lib/pkgconfig
+	export CONFIG_SITE=/opt/windriver/wrlinux/5.0-intel-quark/site-config-i586-wrs-linux
+	export CC=i586-wrswrap-linux-gnu-gcc
+	export CXX=i586-wrswrap-linux-gnu-g++
+	export CPP=i586-wrswrap-linux-gnu-gcc
+	export AS=i586-wrswrap-linux-gnu-as --32
+	export LD=i586-wrswrap-linux-gnu-ld
+	export GDB=i586-wrswrap-linux-gnu-gdb
+	export STRIP=i586-wrswrap-linux-gnu-strip
+	export RANLIB=i586-wrswrap-linux-gnu-ranlib
+	export OBJCOPY=i586-wrswrap-linux-gnu-objcopy
+	export OBJDUMP=i586-wrswrap-linux-gnu-objdump
+	export AR=i586-wrswrap-linux-gnu-ar
+	export NM=i586-wrswrap-linux-gnu-nm
+	export TARGET_PREFIX=i586-wrswrap-linux-gnu-
+	export CONFIGURE_FLAGS=--target=i586-wrs-linux --host=i586-wrs-linux --build=x86_64-linux --with-libtool-sysroot=/opt/windriver/wrlinux/5.0-intel-quark/sysroots/intel_quark-wrs-linux
+	export CFLAGS=-O2 -pipe -g -tpentium -Wa,-mfix-quark-lock --sysroot=/opt/windriver/wrlinux/5.0-intel-quark/sysroots/intel_quark-wrs-linux
+	export CXXFLAGS=-O2 -pipe -g -tpentium -Wa,-mfix-quark-lock --sysroot=/opt/windriver/wrlinux/5.0-intel-quark/sysroots/intel_quark-wrs-linux
+	export LDFLAGS=-Wl,-O1 -Wl,--hash-style=gnu -m --sysroot=/opt/windriver/wrlinux/5.0-intel-quark/sysroots/intel_quark-wrs-linux
+	export CPPFLAGS=-E -tpentium -Wa,-mfix-quark-lock --sysroot=/opt/windriver/wrlinux/5.0-intel-quark/sysroots/intel_quark-wrs-linux
+	export OECORE_NATIVE_SYSROOT=/opt/windriver/wrlinux/5.0-intel-quark/sysroots/x86_64-wrlinuxsdk-linux
+	export OECORE_TARGET_SYSROOT=/opt/windriver/wrlinux/5.0-intel-quark/sysroots/intel_quark-wrs-linux
+	export OECORE_ACLOCAL_OPTS=-I /opt/windriver/wrlinux/5.0-intel-quark/sysroots/x86_64-wrlinuxsdk-linux/usr/share/aclocal
+	export OECORE_DISTRO_VERSION=5.0.1.21
+	export OECORE_SDK_VERSION=5.0-intel-quark
+	export OE_TOOLCHAIN_MACHINE=intel_quark-wrs-linux
+endif

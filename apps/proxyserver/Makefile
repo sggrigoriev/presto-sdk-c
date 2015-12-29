@@ -69,11 +69,6 @@ CFLAGS += -I../../lib/3rdparty/${CJSON_VERSION}
 # Version information
 CFLAGS += -DGIT_FIRMWARE_VERSION=$(shell git log -1 --pretty=format:0x%h)
 
-CC = gcc
-CPP = g++
-AR = ar
-STRIP=strip
-INTEL = 0
 export HARDWARE_PLATFORM = INTEL
 
 OBJECTS_C = $(SOURCES_C:.c=.o)
@@ -102,7 +97,7 @@ clean:
 	@rm -rf ./*.o $(TARGET) ./bin
 	
 $(TARGET): .bin lib $(OBJECTS_C) $(OBJECTS_CPP)
-	@$(CPP) ${CFLAGS} $(LDFLAGS) -o ./bin/$(shell basename $@) ./bin/*.o $(LDEXTRA)
+	@$(CPP) ${CFLAGS} $(LDFLAGS) $(LDEXTRA) ./bin/*.o -o ./bin/$(shell basename $@)
 
 lib:
 	@make -s -C ../../lib
