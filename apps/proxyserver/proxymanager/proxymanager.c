@@ -25,6 +25,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "libconfigio.h"
 
@@ -83,22 +84,40 @@ void proxymanager_startProxy() {
  */
 char * _proxymanager_getUrlFromConfigFile(char *url, int maxsize) {
   bzero(url, maxsize);
+  char *cwd = NULL;
+  char buf[1024];
+
+  cwd = getcwd(buf, sizeof(buf));
+
+  if ( cwd != NULL )
+  {
+      printf("current dir name: (%s)\n", cwd);
+  }
+
+  printf("proxycli_getConfigFilename: (%s)\n", proxycli_getConfigFilename());
 
   if(libconfigio_read(proxycli_getConfigFilename(), CONFIGIO_CLOUD_HOST, url + strlen(url), maxsize - strlen(url)) == -1) {
+    printf("libconfigio_read: fail 1\n");
     goto fail;
   }
 
+#if 0
   snprintf(url + strlen(url), maxsize - strlen(url), ":");
 
+  printf("proxycli_getConfigFilename: (%s)\n", proxycli_getConfigFilename());
   if(libconfigio_read(proxycli_getConfigFilename(), CONFIGIO_CLOUD_PORT, url + strlen(url), maxsize - strlen(url)) == -1) {
+    printf("libconfigio_read: fail 2\n");
     goto fail;
   }
 
   snprintf(url + strlen(url), maxsize - strlen(url), "/");
 
+  printf("proxycli_getConfigFilename: (%s)\n", proxycli_getConfigFilename());
   if(libconfigio_read(proxycli_getConfigFilename(), CONFIGIO_CLOUD_URI, url + strlen(url), maxsize - strlen(url)) == -1) {
+    printf("libconfigio_read: fail 3\n");
     goto fail;
   }
+#endif
 
   return url;
 

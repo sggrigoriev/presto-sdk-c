@@ -8,16 +8,16 @@
 include ${IOTSDK}/c/support/make/Makefile.include
 
 # What is the main file we want to compile
-TARGET = rtoaagent
+TARGET = wemoagent
 
 # Which file(s) are we using
 SOURCES_C = ${TARGET}.c
 
-SOURCES_C += ./control/rtoacontrol.c
-SOURCES_C += ./manager/rtoamanager.c
-SOURCES_C += ./discovery/rtoadiscovery.c
-SOURCES_C += ./heartbeat/rtoaheartbeat.c
-SOURCES_C += ./measure/rtoameasure.c
+SOURCES_C += ./control/wemocontrol.c
+SOURCES_C += ./manager/wemomanager.c
+SOURCES_C += ./discovery/wemodiscovery.c
+SOURCES_C += ./heartbeat/wemoheartbeat.c
+SOURCES_C += ./measure/wemomeasure.c
 SOURCES_C += ${IOTSDK}/c/iot/client/clientsocket.c
 
 # Which test(s) are we trying to run

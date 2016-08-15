@@ -24,7 +24,7 @@
 #endif
 
 #ifndef DEFAULT_PROXY_URL
-#define DEFAULT_PROXY_URL "developer.peoplepowerco.com:8080/deviceio/ml"
+#define DEFAULT_PROXY_URL "sbox.presencepro.com:8080/deviceio/ml"
 #endif
 
 #ifndef DEFAULT_CLOUD_API_PREFIX
@@ -32,11 +32,11 @@
 #endif
 
 #ifndef DEFAULT_APPLICATION_API_BASE_URL
-#define	DEFAULT_APPLICATION_API_BASE_URL "developer.peoplepowerco.com/cloud"
+#define	DEFAULT_APPLICATION_API_BASE_URL "sbox.presencepro.com/cloud"
 #endif
 
 #ifndef DEFAULT_ACTIVATION_URL
-#define DEFAULT_ACTIVATION_URL "developer.peoplepowerco.com/cloud/xml"
+#define DEFAULT_ACTIVATION_URL "sbox.presencepro.com/cloud/xml"
 #endif
 
 #ifndef DEFAULT_DATA_FORMAT
@@ -51,8 +51,9 @@
 #define	DEFAULT_JSON_API_BASE_URL    "cloud/json"
 #endif
 
+// Production, sbox, China
 #ifndef DEFAULT_CLOUD_NAME
-#define	DEFAULT_CLOUD_NAME "Developer"
+#define	DEFAULT_CLOUD_NAME "sbox"
 #endif
 
 #ifndef DEFAULT_API_UPDATE_PERIOD
@@ -60,7 +61,7 @@
 #endif
 
 #ifndef DEFAULT_PROXY_DEVICETYPE
-#define DEFAULT_PROXY_DEVICETYPE "4"
+#define DEFAULT_PROXY_DEVICETYPE "10031"
 #endif
 
 #ifndef DEFAULT_PROXY_CONFIG_FILENAME

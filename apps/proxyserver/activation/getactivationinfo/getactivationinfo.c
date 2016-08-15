@@ -240,6 +240,7 @@ error_t registerDevice(void) {
 
   registrationInfo.resultCode = -1;
 
+  printf("rxBuffer:(%s)\n", rxBuffer);
   if ( 0 == xmlSAXUserParseMemory(&saxHandler, &registrationInfo, rxBuffer, strlen(rxBuffer)) )
   {
 

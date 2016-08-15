@@ -36,6 +36,7 @@
 
 #include "libhttpcomm.h"
 #include "libconfigio.h"
+#include "cJSON.h"
 #include "eui64.h"
 #include "proxyserver.h"
 #include "login.h"
@@ -50,10 +51,15 @@
 static char apiKey[API_KEY_LENGTH];
 
 /***************** Private Prototypes ****************/
+static void parse_object(cJSON *item);
+
 static void _login_xml_startElementHandler(void *ctx, const xmlChar *name, const xmlChar **atts);
 
 static void _login_xml_charactersHandler(void *ctx, const xmlChar *ch, int len);
 
+static int resultCode = -1;
+static char key[PATH_MAX];
+static char keyExpire[PATH_MAX];
 
 /***************** Public Functions ***************/
 /**
@@ -63,7 +69,6 @@ static void _login_xml_charactersHandler(void *ctx, const xmlChar *ch, int len);
  * @return Application API key, or NULL if we couldn't log in
  */
 error_t login_doLogin(const char *username, const char *password) {
-  char baseUrl[PATH_MAX];
   char url[PATH_MAX];
   char rxBuffer[PROXY_MAX_MSG_LEN];
   char headerPassword[PROXY_HEADER_PASSWORD_LEN];
@@ -99,17 +104,12 @@ error_t login_doLogin(const char *username, const char *password) {
       NULL, // fatal
   };
 
-  // Read the activation URL from the configuration file
-  if(libconfigio_read(proxycli_getConfigFilename(), CONFIGIO_ACTIVATION_URL_TOKEN_NAME, baseUrl, sizeof(baseUrl)) == -1) {
-    printf("Couldn't read %s in file %s, writing default value\n", CONFIGIO_ACTIVATION_URL_TOKEN_NAME, proxycli_getConfigFilename());
-    libconfigio_write(proxycli_getConfigFilename(), CONFIGIO_ACTIVATION_URL_TOKEN_NAME, DEFAULT_ACTIVATION_URL);
-    strncpy(baseUrl, DEFAULT_ACTIVATION_URL, sizeof(baseUrl));
-  }
-
-  snprintf(url, sizeof(url), "%s/login?username=%s", baseUrl, username);
+  snprintf(url, sizeof(url), "%s/login?username=%s", proxycli_getApplicationApiUrl(), username);
   snprintf(headerPassword, sizeof(headerPassword), "PASSWORD: %s", password);
 
+  printf("Logging in...\n");
   SYSLOG_INFO("Logging in...");
+  printf("Contacting URL %s\n", url);
   SYSLOG_INFO("Contacting URL %s\n", url);
 
   params.verbose = TRUE;
@@ -123,10 +123,30 @@ error_t login_doLogin(const char *username, const char *password) {
 
   loginInfo.resultCode = -1;
 
-  if ( 0 == xmlSAXUserParseMemory(&saxHandler, &loginInfo, rxBuffer, strlen(rxBuffer)) )
+  if ( strcmp(proxycli_getDataFormat(), "xml") == 0 )
   {
+      if ( 0 == xmlSAXUserParseMemory(&saxHandler, &loginInfo, rxBuffer, strlen(rxBuffer)) )
+      {
 
-      if(loginInfo.resultCode == 0) {
+	  if(loginInfo.resultCode == 0) {
+	      printf("Login successful!\n");
+	      SYSLOG_INFO("Login successful");
+	      return SUCCESS;
+
+	  } else {
+	      printf("Error logging in\n");
+	      return FAIL;
+	  }
+      }
+  }
+  else if ( strcmp(proxycli_getDataFormat(), "json") == 0 )
+  {
+      cJSON *root = cJSON_Parse(rxBuffer);
+      parse_object(root);
+      cJSON_Delete(root);
+
+      if ( resultCode == 0 && strlen(key) > 0 && strlen(keyExpire) > 0 ) {
+	  SYSLOG_INFO("resultCode: %d key: %s keyExpire: %s", resultCode, key, keyExpire);
 	  printf("Login successful!\n");
 	  SYSLOG_INFO("Login successful");
 	  return SUCCESS;
@@ -135,6 +155,10 @@ error_t login_doLogin(const char *username, const char *password) {
 	  printf("Error logging in\n");
 	  return FAIL;
       }
+  }
+  else
+  {
+      SYSLOG_ERR("Invalid data format: %s", proxycli_getDataFormat());
   }
 
 
@@ -151,6 +175,41 @@ char *login_getApiKey() {
 }
 
 /***************** Private Functions ****************/
+/**
+ * Parse a JSON item
+ */
+static void parse_object(cJSON *item)
+{
+    if ( cJSON_GetArraySize(item) > 0 )
+    {
+	int i = 0;
+	resultCode = -1;
+	key[0] = 0;
+	keyExpire[0] = 0;
+
+
+	for (i=0;i<cJSON_GetArraySize(item);i++)
+	{
+	    cJSON *subitem=cJSON_GetArrayItem(item,i);
+	    // handle subitem.	
+	    if ( subitem->string != NULL )
+	    {
+
+		if ( strcmp(subitem->string, "resultCode") == 0) {
+		    resultCode = subitem->valueint;
+		}
+		else if ( strcmp(subitem->string, "key") == 0) {
+		    strncpy(key, subitem->valuestring, sizeof(key));
+		}
+		else if ( strcmp(subitem->string, "keyExpire") == 0) {
+		    strncpy(keyExpire, subitem->valuestring, sizeof(keyExpire));
+		}
+	    }
+	}
+
+    }
+}
+
 /**
  * Parse a new XML tag
  */
