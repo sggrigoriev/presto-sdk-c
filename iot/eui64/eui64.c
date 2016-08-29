@@ -53,6 +53,7 @@ error_t eui64_toBytes(uint8_t *dest, int destLen) {
   int sock, i;
   int ok = 0;
 
+
   assert(dest);
 
   if(destLen < EUI64_BYTES_SIZE) {
@@ -107,11 +108,13 @@ error_t eui64_toBytes(uint8_t *dest, int destLen) {
  * Copy the EUI64 into a string
  * @return SUCCESS if we are able to capture the EUI64
  */
+extern char *argEui64Bytes;
 error_t eui64_toString(char *dest, int destLen) {
   uint8_t byteAddress[EUI64_BYTES_SIZE], i;
   uint16_t checksum= 0;
   char deviceType[DEVICE_TYPE_SIZE];
   char *tmp = NULL;
+  extern char* argDeviceType;
 
   assert(dest);
 
@@ -121,13 +124,27 @@ error_t eui64_toString(char *dest, int destLen) {
 
   /* new format: ${MAC_ADDRESS}-${PRODUCT_ID}-${CHECKSUM} */
   if (eui64_toBytes(byteAddress, sizeof(byteAddress)) == SUCCESS) {
+
     memset(deviceType, 0x0, DEVICE_TYPE_SIZE);
     readDeviceType(deviceType);
 
+    if ( argDeviceType != NULL )
+    {
+	strncpy(deviceType, argDeviceType, sizeof(deviceType));
+    }
+
     memset(dest, 0x0, destLen);
-    snprintf(dest, destLen, "%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X-%s-",
-        byteAddress[0], byteAddress[1], byteAddress[2], byteAddress[3],
-        byteAddress[4], byteAddress[5], deviceType);
+    if ( argEui64Bytes != NULL )
+    {
+	snprintf(dest, destLen, "%s-%s-",
+		argEui64Bytes, deviceType);
+    }
+    else
+    {
+	snprintf(dest, destLen, "%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X-%s-",
+		byteAddress[0], byteAddress[1], byteAddress[2], byteAddress[3],
+		byteAddress[4], byteAddress[5], deviceType);
+    }
 
     for(i = 0; i < strlen(dest) ; i++ ) {
         checksum+= dest[i];
@@ -163,6 +180,11 @@ error_t readDeviceType(char *deviceType)
 #if defined(DEFAULT_PROXY_CONFIG_FILENAME) && defined(CONFIGIO_PROXY_DEVICE_TYPE_TOKEN_NAME)
   FILE *fp= fopen(DEFAULT_PROXY_CONFIG_FILENAME,"r");
   char line[1024];
+
+  if ( deviceType[0] != 0 )
+  {
+      return SUCCESS;
+  }
   
   if ( fp!= NULL ) {
     while(fgets(line, sizeof(line), fp)) {

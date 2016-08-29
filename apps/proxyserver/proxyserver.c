@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
   printf("Using configuration file %s\n", proxycli_getConfigFilename());
   SYSLOG_INFO("Using configuration file %s", proxycli_getConfigFilename());
 
-  // Get FabrUX connection settings
+  // Get Presto connection settings
   eui64_toString(eui64, sizeof(eui64));
   printf("The proxy device ID is %s\n", eui64);
   SYSLOG_INFO("The proxy device ID is %s\n", eui64);
@@ -373,7 +373,7 @@ void api_update_timer_init (void)
     }
     else
     {
-	SYSLOG_ERR("Get FabrUX connection setting interval initiate failed.\n");
+	SYSLOG_ERR("Get Presto connection setting interval initiate failed.\n");
     }
 }
 
@@ -383,7 +383,7 @@ void api_update_timer_init (void)
  */
 void *timer_thread_func ( void *arg )
 {
-    // Inital a timer for update application API url from APP API: Available FabrUX instances
+    // Inital a timer for update application API url from APP API: Available Presto instances
     api_update_timer_init();
 
     return NULL;

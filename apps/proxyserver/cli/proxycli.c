@@ -189,9 +189,9 @@ const char *proxycli_setCloudName( const char *name ) {
 }
 
 /**
- * Set the data format proxy interaction with FabrUX
- * @param format The data format proxy going to interaction with FabrUX
- * @return The data format which the proxy interactiion with FabrUX
+ * Set the data format proxy interaction with Presto
+ * @param format The data format proxy going to interaction with Presto
+ * @return The data format which the proxy interactiion with Presto
  */
 const char *proxycli_setDataFormat ( const char *format ) {
     if ( dataFormat != NULL ) free(dataFormat);
@@ -207,7 +207,7 @@ const char *proxycli_getCloudName ( void ) {
 }
 
 /**
- * @return The data format which the proxy interactiion with FabrUX
+ * @return The data format which the proxy interactiion with Presto
  */
 const char *proxycli_getDataFormat ( void ) {
   return dataFormat;
@@ -279,7 +279,7 @@ static void _proxycli_printUsage() {
     "\t[-n port] : Define the port to open the proxy on\n"
     "\t[-c filename] : The name of the configuration file for the proxy\n"
     "\t[-l cloud_name] : The name of the Cloud the proxy want to interaction with\n"
-    //"\t[-f format] : The data format that proxy used to interaction with FabrUX, xml or json\n"
+    //"\t[-f format] : The data format that proxy used to interaction with Presto, xml or json\n"
     //"\t[-a key] : Activate this proxy using the given activation key and exit\n"
     "\t[-v] : Print version information\n"
     "\t[-?] : Print this menu\n"

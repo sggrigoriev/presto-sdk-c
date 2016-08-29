@@ -68,7 +68,7 @@
 #define DEFAULT_PROXY_CONFIG_FILENAME "proxy.conf"
 #endif
 
-/** Name of the token in our config file that data format interacting with FabrUX */
+/** Name of the token in our config file that data format interacting with Presto */
 #define CONFIGIO_DATA_FORMAT_TOKEN_NAME "DATA_FORMAT"
 
 /** Name of the token in our config file that stores the device type */
@@ -104,7 +104,7 @@
 /** Name of the token in our config file that stores last update time of application API url */
 #define	CONFIGIO_API_URL_LAST_UPDATE_TIME_TOKEN_NAME "APPLICATION_API_LAST_UPDATE_TIME"
 
-/** Name of the token in our config file that stores how long we need to re-get FabrUX connection settings, in seconds */
+/** Name of the token in our config file that stores how long we need to re-get Presto connection settings, in seconds */
 #define	CONFIGIO_API_URL_UPDATE_PERIOD "APPLICATION_API_UPDATE_PERIOD"
 
 /** Name of the user that activated the proxy */

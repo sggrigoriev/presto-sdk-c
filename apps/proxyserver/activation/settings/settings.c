@@ -56,7 +56,7 @@ static char currentCloudName[PATH_MAX];
 static char lookupCloudName[PATH_MAX];
 /***************** Public Functions ***************/
 /**
- * Get FabrUX connection settings for specified device ID
+ * Get Presto connection settings for specified device ID
  *
  * @param deviceId device ID
  * @return Location ID, or -1 if we couldn't obtain it
