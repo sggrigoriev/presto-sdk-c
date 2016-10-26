@@ -170,9 +170,23 @@ or a proxy to Presto.
 
 
 
+COMPILE GUIDE
+-------------
+To compile proxyserver for Presto, follow the instructions below:
+
+> $ cd presto-sdk-c
+
+> $ export IOTSDK=\`pwd\`
+
+> $ cd apps/proxyserve
+
+> $ make
+
+
+
 COPYRIGHT
 ----------
-Copyright 2013 People Power Company
+Copyright 2016 People Power Company
 
 This code was developed with funding from People Power Company
 
