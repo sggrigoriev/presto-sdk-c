@@ -62,6 +62,8 @@
 
 /** Process termination flag */
 static int gTerminate = false;
+char *argEui64Bytes = NULL;
+char *argDeviceType = NULL;
 
 /** Client socket FD */
 static int clientSocketFd;
