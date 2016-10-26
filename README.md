@@ -178,7 +178,7 @@ To compile proxyserver for Presto, follow the instructions below:
 
 > $ export IOTSDK=\`pwd\`
 
-> $ cd apps/proxyserve
+> $ cd apps/proxyserver
 
 > $ make
 
