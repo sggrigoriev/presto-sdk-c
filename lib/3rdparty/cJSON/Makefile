@@ -4,7 +4,7 @@
 #
 # @author Yvan Castilloux
 
-include ${IOTSDK}/support/make/Makefile.include
+include ../../../support/make/Makefile.include
 
 LIB_NAME = libcJSON
 SOURCES = cJSON.c
