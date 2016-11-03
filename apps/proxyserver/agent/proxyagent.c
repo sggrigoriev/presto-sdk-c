@@ -223,7 +223,7 @@ static void _doCommand(command_t *cmd) {
 
   /**
    * Debug code for your convenience
-   *
+   **/
   SYSLOG_INFO(">> RECEIVED COMMAND: ");
   SYSLOG_INFO("noMoreCommands=%d", cmd->noMoreCommands);
   SYSLOG_INFO("userIsWatching=%d", cmd->userIsWatching);
@@ -245,7 +245,7 @@ static void _doCommand(command_t *cmd) {
   }
 
   SYSLOG_INFO("<< RECEIVED COMMAND");
-   */
+   //*/
 }
 
 /**
